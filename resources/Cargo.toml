@@ -5,3 +5,7 @@ authors = ["Junha Yang <junhayang1@gmail.com>"]
 edition = '2018'
 
 [dependencies]
+fere-common = { path = "../common" }
+gl = "0.14.0"
+image = "0.23"
+serde = "1.0"
