@@ -3,5 +3,6 @@ members = [
     "core",
     "resources",
     "common",
-    "examples"
+    "fere",
+    "examples",
 ]
