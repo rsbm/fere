@@ -4,3 +4,4 @@ Luckily, users of *fere* don't have to know about this.
 */
 
 mod glmanager;
+mod graphics;

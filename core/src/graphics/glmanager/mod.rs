@@ -2,19 +2,26 @@ mod compile;
 pub mod light;
 pub mod shader;
 
+use super::*;
 use shader::*;
-use std::{collections::hash_map::HashMap, io::prelude::*, sync::Arc};
-use tpf_package::static_map::{StaticMap, StaticMapKind};
+use std::fs::read_to_string;
+use std::path::PathBuf;
+use std::{collections::HashMap, io::prelude::*, sync::Arc};
 
-pub struct StaticMapShader;
-impl StaticMapKind for StaticMapShader {
-    fn kind() -> i16 {
-        100
-    }
+fn get_shader_config_path() -> PathBuf {
+    let mut path_to_shader = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
+    path_to_shader.push("shaders/config.yaml");
+    path_to_shader
+}
+
+fn get_shader_path(path: &str) -> PathBuf {
+    let mut path_to_shader = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
+    path_to_shader.push(format!("shaders/{}", path));
+    path_to_shader
 }
 
 pub struct GlManager {
-    programs: StaticMap<Arc<Shader>, StaticMapShader>,
+    programs: HashMap<String, Arc<Shader>>,
 }
 
 const ERROR_MSG: &str = "Failed to read shaders. Fatal Error";
@@ -33,7 +40,7 @@ impl GlManager {
         }
 
         let programs_list: Vec<(String, String, String)> =
-            tpf_package::read_yaml("$C/shader/config.yaml").expect(ERROR_MSG);
+            serde_yaml::from_str(&read_to_string(get_shader_config_path()).unwrap()).unwrap();
 
         let mut programs = HashMap::new();
 
@@ -42,34 +49,19 @@ impl GlManager {
                 name.clone(),
                 Arc::new(Shader::new(
                     name,
-                    &{
-                        let mut buf = String::new();
-                        tpf_package::read_file(&vert)
-                            .expect(ERROR_MSG)
-                            .read_to_string(&mut buf)
-                            .expect(ERROR_MSG);
-                        buf
-                    },
+                    &read_to_string(vert).unwrap(),
                     &vert,
-                    &{
-                        let mut buf = String::new();
-                        tpf_package::read_file(&frag)
-                            .expect(ERROR_MSG)
-                            .read_to_string(&mut buf)
-                            .expect(ERROR_MSG);
-                        buf
-                    },
+                    &read_to_string(frag).unwrap(),
                     &frag,
                 )),
             );
         }
-        let programs = StaticMap::new(programs);
         GlManager { programs }
     }
 
     pub fn get_program(&self, key: &str) -> Arc<Shader> {
-        let program = self.programs.get(key);
-        program.clone()
+        let program = self.programs.get(key).unwrap();
+        Arc::clone(&program)
     }
 }
 

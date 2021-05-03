@@ -1,11 +1,12 @@
 #![allow(clippy::needless_range_loop)]
 
 use super::light::*;
+use fere_common::*;
 use gl::types::*;
 use heck::SnakeCase;
 use std::ffi::CString;
 use strum::IntoEnumIterator;
-use tpf_math::types::*;
+use strum_macros::{AsRefStr, EnumIter};
 
 const UNIFORM_MAX: usize = 16;
 

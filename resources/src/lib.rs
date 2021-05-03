@@ -4,3 +4,8 @@ pub mod texture;
 
 pub use mesh::{Mesh, MeshData};
 pub use texture::{Texture, TextureData};
+
+#[test]
+fn qwe() {
+    println!("{}", file!());
+}
