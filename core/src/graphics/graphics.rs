@@ -1,4 +1,3 @@
-pub mod draw;
 pub mod material;
 mod pass;
 mod prgs;
@@ -12,11 +11,13 @@ use super::{
     },
     render_unit::RenderUnit,
 };
-use crate::glmanager::light::*;
+use crate::graphics::glmanager::light::*;
+use fere_common::*;
+use fere_resources::*;
 use gl::types::GLuint;
+use mesh::obj;
+use serde::{Deserialize, Serialize};
 use texture_internal::{FrameBuffer, TextureInternal3D};
-use tpf_math::types::*;
-use tpf_package::resources::*;
 
 pub fn deferred_mode(color: bool, depth: bool, index: bool) {
     unsafe {
@@ -54,6 +55,14 @@ impl TextureFetcher {
     }
 }
 
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct GraphicsConfig {
+    pub resolution: IVec2,
+    pub shadow_resolution: usize,
+    pub probe_resolution: usize,
+    pub max_major_lights: usize,
+}
+
 pub struct Graphics {
     gl_manager: GlManager,
 
@@ -66,81 +75,26 @@ pub struct Graphics {
     pass_probe: FrameBuffer,
 
     // useful meshes
-    mesh_square: Mesh,
-    _mesh_square_coarse: Mesh,
-    mesh_sphere: Mesh,
-    mesh_pyramid: Mesh,
-    mesh_cube: Mesh,
+    meshes: crate::graphics::resources::Meshes,
 
     pub prgs: prgs::Programs,
 }
 
 impl Graphics {
-    pub fn new() -> Self {
+    pub fn new(config: GraphicsConfig) -> Self {
         let gl_manager = GlManager::new("".to_string());
-        let screen_size = tpf_config::get_global_context().params.display.resolution;
-        let screen_size = IVec2::new(screen_size.0, screen_size.1);
-        let max_major_lights = tpf_config::get_global_context()
-            .configs
-            .rendering
-            .max_major_lights;
+        let screen_size = config.resolution;
+        let max_major_lights = config.max_major_lights;
 
         let pass_deferred1 = pass::create_deferred(screen_size);
         let pass_final = pass::create_final(screen_size);
 
         let pass_shadow = (0..max_major_lights)
-            .map(|_| {
-                pass::create_shadow(
-                    tpf_config::get_global_context()
-                        .params
-                        .rendering
-                        .shadow_resolution as u32,
-                )
-            })
+            .map(|_| pass::create_shadow(config.shadow_resolution as u32))
             .collect::<Vec<_>>();
-        let pass_probe = pass::create_probe(
-            tpf_config::get_global_context()
-                .params
-                .rendering
-                .probe_resolution as u32,
-        );
+        let pass_probe = pass::create_probe(config.probe_resolution as u32);
 
-        let mut mesh_square = Mesh::new(
-            None,
-            obj::import_single("", tpf_package::read_file("$N/meshes/square.obj").unwrap())
-                .unwrap(),
-        );
-        let mut mesh_square_coarse = Mesh::new(
-            None,
-            obj::import_single(
-                "",
-                tpf_package::read_file("$N/meshes/square_coarse.obj").unwrap(),
-            )
-            .unwrap(),
-        );
-        let mut mesh_sphere = Mesh::new(
-            None,
-            obj::import_single(
-                "",
-                tpf_package::read_file("$N/meshes/sphere_low.obj").unwrap(),
-            )
-            .unwrap(),
-        );
-        let mut mesh_cube = Mesh::new(
-            None,
-            obj::import_single("", tpf_package::read_file("$N/meshes/cube.obj").unwrap()).unwrap(),
-        );
-        let mut mesh_pyramid = Mesh::new(
-            None,
-            obj::import_single("", tpf_package::read_file("$N/meshes/pyramid.obj").unwrap())
-                .unwrap(),
-        );
-
-        mesh_square.buffer();
-        mesh_square_coarse.buffer();
-        mesh_sphere.buffer();
-        mesh_cube.buffer();
-        mesh_pyramid.buffer();
+        let meshes = crate::graphics::resources::Meshes::default();
 
         let prgs = prgs::Programs::new(&gl_manager);
 
@@ -151,11 +105,7 @@ impl Graphics {
             pass_final,
             pass_shadow,
             pass_probe,
-            mesh_square,
-            _mesh_square_coarse: mesh_square_coarse,
-            mesh_sphere,
-            mesh_cube,
-            mesh_pyramid,
+            meshes,
             prgs,
         }
     }
@@ -251,13 +201,13 @@ impl Graphics {
             &Vec3::from_element(radius),
             false,
         );
-        self.draw_lighvolume_common(&self.mesh_sphere);
+        self.draw_lighvolume_common(&self.meshes.sphere);
     }
 
     pub fn get_transform_for_lightvolume_dir(light: &LightDir) -> Mat4 {
         let mut trans = glm::translate(&Mat4::identity(), &glm::vec4_to_vec3(&light.light.pos));
 
-        trans *= tpf_math::geo::rotation_between(
+        trans *= fere_common::geo::rotation_between(
             &Vec3::new(1.0, 0.0, 0.0),
             &Vec3::new(0.0, -1.0, 0.0),
             &light.xdir,
@@ -269,7 +219,11 @@ impl Graphics {
             &Vec3::new((light.angle / 2.0).tan(), (light.angle / 2.0).tan(), 1.0),
         );
         trans = glm::translate(&trans, &Vec3::new(0.0, 0.0, 1.0));
-        trans = glm::rotate(&trans, 180.0.to_radian(), &Vec3::new(1.0, 0.0, 0.0));
+        trans = glm::rotate(
+            &trans,
+            (180.0 as f32).to_radians(),
+            &Vec3::new(1.0, 0.0, 0.0),
+        );
         trans
     }
 
@@ -279,7 +233,7 @@ impl Graphics {
 
         let trans = Self::get_transform_for_lightvolume_dir(light);
         program.uniform_model(&trans, false);
-        self.draw_lighvolume_common(&self.mesh_pyramid);
+        self.draw_lighvolume_common(&self.meshes.pyramid);
     }
 
     pub fn draw_lightvolume_ambient(
@@ -289,21 +243,21 @@ impl Graphics {
         cpos: &Vec3,
         size: &Vec3,
     ) {
-        self.mesh_cube.bind();
+        self.meshes.cube.bind();
 
         let trans = glm::translate(&glm::identity(), cbpos);
         let trans = glm::scale(&trans, size);
         let trans = glm::translate(&trans, &Vec3::new(0.0, 0.0, 0.5));
         program.uniform_model(&trans, false);
         program.uniform_camera(&cpos);
-        self.draw_lighvolume_common(&self.mesh_cube);
+        self.draw_lighvolume_common(&self.meshes.cube);
     }
 
     pub fn fill_screen(&self, prg: &Shader) {
         prg.uniform_transformations(&Mat4::new_scaling(2.0), &Mat4::identity());
-        self.mesh_square.bind();
+        self.meshes.square.bind();
         prg.uniform_model(&Mat4::identity(), false);
-        self.mesh_square.draw();
+        self.meshes.square.draw();
     }
 
     pub fn bind_deferred_pass1(&self) {

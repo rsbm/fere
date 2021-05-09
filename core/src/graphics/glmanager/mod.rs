@@ -49,9 +49,9 @@ impl GlManager {
                 name.clone(),
                 Arc::new(Shader::new(
                     name,
-                    &read_to_string(vert).unwrap(),
+                    &read_to_string(vert.clone()).unwrap(),
                     &vert,
-                    &read_to_string(frag).unwrap(),
+                    &read_to_string(frag.clone()).unwrap(),
                     &frag,
                 )),
             );

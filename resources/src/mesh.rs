@@ -1,8 +1,7 @@
-mod obj;
+pub mod obj;
 
 use fere_common::*;
 use gl::types::*;
-pub use obj::{import, import_single};
 
 #[derive(Debug, Default)]
 pub struct MeshData {

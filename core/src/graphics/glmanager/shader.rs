@@ -192,7 +192,6 @@ impl Shader {
         &self.uloc_tex
     }
 
-    /// TODO: Remove this
     pub fn uniform_color(&self, color: &IVec4) {
         let u: GLint;
         u = self.uloc[Uniform::Color as usize];
@@ -217,7 +216,7 @@ impl Shader {
             let trans = glm::translate(&Mat4::identity(), p1);
             let trans = glm::scale(&trans, &(p2 - p1));
 
-            crate::graphics::draw::bind_fixed_color(self, color);
+            self.uniform_color(color);
 
             let u: GLint;
             u = self.uloc[Uniform::Model as usize];
@@ -228,7 +227,9 @@ impl Shader {
     pub fn uniform_wireframe(&self, trans: &Mat4, color: &IVec4, width: f32) {
         unsafe {
             gl::LineWidth(width);
-            crate::graphics::draw::bind_fixed_color(self, color);
+
+            self.uniform_color(color);
+
             let u: GLint;
             u = self.uloc[Uniform::Model as usize];
             gl::UniformMatrix4fv(u, 1, gl::FALSE, trans.as_ptr());
@@ -251,9 +252,7 @@ impl Shader {
             u = self.uloc[Uniform::Model as usize];
             gl::UniformMatrix4fv(u, 1, gl::FALSE, model_transform.as_ptr());
             u = self.uloc[Uniform::Model3 as usize];
-            let mat3: Mat3 = model_transform
-                .fixed_slice::<nalgebra::U3, nalgebra::U3>(0, 0)
-                .into();
+            let mat3: Mat3 = model_transform.fixed_slice::<3, 3>(0, 0).into();
             gl::UniformMatrix3fv(u, 1, gl::FALSE, mat3.as_ptr());
             u = self.uloc[Uniform::Inside as usize];
             gl::Uniform1i(u, inside as i32);

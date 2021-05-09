@@ -1,8 +1,8 @@
 use super::Texture;
-use crate::glmanager::shader::{Shader, Uniform};
+use crate::graphics::glmanager::shader::{Shader, Uniform};
+use fere_common::*;
+use fere_resources::surface::*;
 use std::sync::Arc;
-use tpf_math::types::*;
-use tpf_package::resources::surface::*;
 
 /*
 Texture mapping
@@ -227,4 +227,19 @@ pub fn bind_simple_general(prg: &Shader, surface: &GeneralSimple) {
         Uniform::EmissionIntensityOn,
         Uniform::EmissionIntensity,
     );
+}
+
+pub fn bind_fixed_color(prg: &Shader, color: &IVec4) {
+    let surface = TransparentI {
+        general: GeneralI {
+            basecolor: TexVar::U(color.xyz()),
+            roughness: TexVar::U(0),
+            metalness: TexVar::U(0),
+            normal: no_normal_map(),
+        },
+        alpha: TexVar::U(0),
+    };
+
+    bind_general(prg, &surface.general);
+    bind_transparent(prg, &surface);
 }

@@ -1,4 +1,4 @@
-use crate::glmanager::shader::Shader;
+use crate::graphics::glmanager::{shader::Shader, GlManager};
 use std::sync::Arc;
 
 pub struct Programs {
@@ -29,7 +29,7 @@ pub struct Programs {
 }
 
 impl Programs {
-    pub fn new(glmanager: &crate::glmanager::GlManager) -> Self {
+    pub fn new(glmanager: &GlManager) -> Self {
         Programs {
             dr_1: glmanager.get_program("dr_1"),
             dr_2: glmanager.get_program("dr_2"),

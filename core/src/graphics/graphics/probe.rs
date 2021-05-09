@@ -1,4 +1,5 @@
 use super::*;
+use fere_common::*;
 
 impl Graphics {
     /// Does some shit

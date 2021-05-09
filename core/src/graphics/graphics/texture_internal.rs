@@ -1,5 +1,5 @@
+use fere_common::*;
 use gl::types::{GLenum, GLuint};
-use tpf_math::types::*;
 
 pub enum InternalTexType {
     Float1,     //

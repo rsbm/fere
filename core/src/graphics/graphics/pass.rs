@@ -1,10 +1,10 @@
+use super::super::glmanager::shader::Shader;
 use super::{
     deferred_mode,
     texture_internal::{FrameBuffer, InternalTexType, TextureInternal2D, TextureInternal3D},
 };
-use crate::glmanager::shader::Shader;
+use fere_common::*;
 use gl::types::GLenum;
-use tpf_math::types::*;
 
 // Rendering Pipeline
 // TODO
@@ -67,10 +67,6 @@ pub fn bind_shadow(graphics: &super::Graphics, index: usize) {
 }
 
 pub fn bind_probe(graphics: &super::Graphics) {
-    tpf_config::set_debug_data(tpf_config::DebugData {
-        tex1: graphics.pass_probe.outputs_get()[1].tex_get().raw_get(),
-    });
-
     deferred_mode(true, true, false);
     graphics.pass_probe.bind();
     graphics.pass_probe.clear_depth();
@@ -133,8 +129,6 @@ pub fn bind_gbuffer(graphics: &super::Graphics, program: &Shader, offset: usize)
             gl::Uniform1i(program.uloc_get_tex()[i + offset], (i + offset) as i32)
         }
     }
-
-    let _debug_data = tpf_config::get_debug_data();
 }
 
 pub fn bind_probe_volume(
