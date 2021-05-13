@@ -12,10 +12,10 @@ use super::{
     render_unit::RenderUnit,
 };
 use crate::graphics::glmanager::light::*;
+use crate::graphics::resources::Meshes;
 use fere_common::*;
 use fere_resources::*;
 use gl::types::GLuint;
-use mesh::obj;
 use serde::{Deserialize, Serialize};
 use texture_internal::{FrameBuffer, TextureInternal3D};
 
@@ -75,7 +75,7 @@ pub struct Graphics {
     pass_probe: FrameBuffer,
 
     // useful meshes
-    meshes: crate::graphics::resources::Meshes,
+    meshes: Meshes,
 
     pub prgs: prgs::Programs,
 }
@@ -94,7 +94,7 @@ impl Graphics {
             .collect::<Vec<_>>();
         let pass_probe = pass::create_probe(config.probe_resolution as u32);
 
-        let meshes = crate::graphics::resources::Meshes::default();
+        let meshes = Meshes::default();
 
         let prgs = prgs::Programs::new(&gl_manager);
 
@@ -108,6 +108,10 @@ impl Graphics {
             meshes,
             prgs,
         }
+    }
+
+    pub fn meshes(&self) -> &Meshes {
+        &self.meshes
     }
 
     /// Returns (FrameBuffer, ColorAttachment Index) for the UI.

@@ -184,10 +184,15 @@ dependencies = [
  "crossbeam",
  "fere-common",
  "fere-resources",
+ "gl",
+ "heck",
  "log",
  "parking_lot",
  "rand",
  "serde",
+ "serde_yaml",
+ "strum",
+ "strum_macros",
  "thiserror",
 ]
 
@@ -201,27 +206,6 @@ dependencies = [
  "ncollide3d",
  "once_cell",
  "serde",
- "thiserror",
-]
-
-[[package]]
-name = "fere-core"
-version = "0.0.0"
-dependencies = [
- "chrono",
- "crossbeam",
- "fere",
- "fere-common",
- "fere-resources",
- "gl",
- "heck",
- "log",
- "parking_lot",
- "rand",
- "serde",
- "serde_yaml",
- "strum",
- "strum_macros",
  "thiserror",
 ]
 

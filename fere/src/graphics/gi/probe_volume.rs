@@ -6,7 +6,7 @@ mod suite;
 use crate::CameraInfo;
 use fere_common::*;
 use fere_common::{
-    geo::SixDir,
+    geo::{six_sides_dir, SixDir},
     vec::{GridAccessor3, IteratorVec2, IteratorVec3},
 };
 use rand::{rngs::StdRng, Rng};
@@ -60,14 +60,14 @@ impl ProbeVolume {
     }
 
     pub fn camera(&self, index: IVec3, side: SixDir) -> CameraInfo {
-        let dir = tpf_math::geo::six_sides_dir(side);
+        let dir = six_sides_dir(side);
         let forward_dir = -glm::cross(&dir.0, &dir.1);
         let pos = self.probes[GridAccessor3(self.number).get(&index)].pos;
         CameraInfo::new(
             pos,
             pos + forward_dir,
             dir.1,
-            90.0.to_radian(),
+            90.0_f32.to_radians(),
             1.0,
             0.2,
             200.0,
@@ -135,12 +135,12 @@ impl ProbeVolume {
             for c in 0..param {
                 sh[c] = (
                     Vec3::new(
-                        rng.gen_range(-1.0, 1.0),
-                        rng.gen_range(-1.0, 1.0),
-                        rng.gen_range(-1.0, 1.0),
+                        rng.gen_range(-1.0..1.0),
+                        rng.gen_range(-1.0..1.0),
+                        rng.gen_range(-1.0..1.0),
                     ),
                     Vec3::new(0.0, 0.0, 0.0),
-                    rng.gen_range(0.0, 1.0),
+                    rng.gen_range(0.0..1.0),
                 );
             }
             let probe = Probe { sh, pos };

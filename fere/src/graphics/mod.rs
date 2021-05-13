@@ -3,8 +3,8 @@ This module is really unorganized and inconsistent in its interface.
 Luckily, users of *fere* don't have to know about this.
 */
 
-mod gi;
-mod glmanager;
-mod graphics;
-mod render_unit;
-mod resources;
+pub(crate) mod gi;
+pub(crate) mod glmanager;
+pub(crate) mod graphics;
+pub(crate) mod render_unit;
+pub(crate) mod resources;

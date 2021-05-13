@@ -1,8 +1,12 @@
 use super::*;
+use crate::ops::*;
 
-pub type OpQueueSender = crossbeam::channel::Sender<RenderOp>;
-pub type OpQueueReceiver = crossbeam::channel::Receiver<RenderOp>;
+pub(crate) type OpQueueSender = crossbeam::channel::Sender<RenderOp>;
+pub(crate) type OpQueueReceiver = crossbeam::channel::Receiver<RenderOp>;
 
+/// Configurations for a single frame.
+///
+/// You must provide this for the every frames you're rendering. (e.g 60 times in a sec)
 pub struct FrameConfig {
     pub camera: CameraInfo,
 }

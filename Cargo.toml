@@ -1,8 +1,7 @@
 [workspace]
 members = [
-    "core",
+    "fere",
     "resources",
     "common",
-    "fere",
     "examples",
 ]

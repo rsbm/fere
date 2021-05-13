@@ -1,275 +1,178 @@
-pub mod frame;
+mod frame;
+mod graphics;
+pub mod ops;
+mod renderer;
 
+use crate::graphics::gi::probe_volume::ProbeVolumeSuite;
+use crate::graphics::graphics::{Graphics, GraphicsConfig};
+use fere_common::geo::SixDir;
+use fere_common::vec::IteratorVec4;
 use fere_common::*;
-use fere_resources::{surface, Mesh, Texture};
-use std::sync::Arc;
+pub use frame::{Frame, FrameConfig};
+use frame::{OpQueueReceiver, OpQueueSender};
+use ops::ChamberIndex;
+use renderer::{RenderEnd, Renderer, RendererParams};
+use serde::Deserialize;
+use thiserror::Error;
 
-pub type ChamberIndex = u16;
-
-/// `RenderOp` variants that require this aren't supposed to be created by users.
-///
-/// DO NOT attempt to create this by yourself.
-pub struct InternalOp {
-    _creation_barrier: (),
+#[derive(Error, Debug)]
+pub enum Error {
+    #[error("Invalid chamber accesses")]
+    InvalidChamberAccess,
 }
 
-impl InternalOp {
-    pub fn do_not_call_this() -> Self {
+#[derive(Clone, Debug)]
+pub struct ChamberConfig {
+    pub bpos: Vec3,
+    pub size: Vec3,
+}
+
+pub struct ChamberState {
+    current_probe: (IVec3, SixDir),
+    probe_volume_suite: ProbeVolumeSuite,
+}
+
+impl ChamberState {
+    fn set_next_probe(&mut self) {
+        let num = self.probe_volume_suite.probe_volume().number();
+        let mut i = IteratorVec4 {
+            size: IVec4::new(6, num.x, num.y, num.z),
+            cur: IVec4::new(
+                self.current_probe.0.x,
+                self.current_probe.0.y,
+                self.current_probe.0.z,
+                self.current_probe.1 as i32,
+            ),
+        };
+        self.current_probe = if let Some(x) = i.next() {
+            (IVec3::new(x.w, x.z, x.y), x.x as i8)
+        } else {
+            (IVec3::new(0, 0, 0), 0)
+        };
+    }
+}
+
+pub struct Chamber {
+    config: ChamberConfig,
+    state: ChamberState,
+}
+
+/// Configurations for a Fere Instance, required only once for the initial creation.
+#[derive(Clone, Debug, Deserialize)]
+pub struct FereConfigs {
+    pub resolution: IVec2,
+
+    pub shadow_resolution: usize,
+    pub probe_resolution: usize,
+    pub max_major_lights: usize,
+
+    pub max_chamber_num: usize,
+
+    pub pv_scale: f32,
+    pub pv_resolution: usize,
+}
+
+/// The Fere instance.
+pub struct Fere {
+    graphics: Option<Graphics>,
+    configs: FereConfigs,
+    chambers: Vec<Option<Chamber>>,
+}
+
+impl Fere {
+    pub fn new(configs: FereConfigs) -> Self {
         Self {
-            _creation_barrier: (),
+            graphics: Some(Graphics::new(GraphicsConfig {
+                resolution: configs.resolution,
+                shadow_resolution: configs.shadow_resolution,
+                probe_resolution: configs.probe_resolution,
+                max_major_lights: configs.max_major_lights,
+            })),
+            chambers: (0..configs.max_chamber_num).map(|_| None).collect(),
+            configs,
         }
     }
-}
 
-#[derive(Debug)]
-pub struct Object {
-    /// The mesh to render.
-    pub mesh: Arc<Mesh>,
-
-    /// Whether to count in the shadow phase or not.
-    pub shadow: bool,
-
-    /// Whether to count in the irradiance volume phase or not.
-    pub irradiance_volume: bool,
-
-    /// The model transformation.
-    pub trans: Mat4,
-
-    /// The index of the chamber this object belongs to
-    pub chamber_index: ChamberIndex,
-}
-
-#[derive(Debug)]
-pub struct General {
-    /// The object
-    pub object: Object,
-
-    /// The surface to apply on the mesh.
-    pub surface: surface::GeneralI,
-}
-impl From<General> for RenderOp {
-    fn from(x: General) -> Self {
-        Self::DrawGeneral(x)
+    /// Returns internal graphics state.
+    ///
+    /// It won't be ever used by the most of users.
+    pub fn graphics(&self) -> &Graphics {
+        self.graphics.as_ref().unwrap()
     }
-}
 
-#[derive(Debug)]
-pub struct EmissiveStatic {
-    /// The object
-    pub object: Object,
-
-    /// The surface to apply on the mesh.
-    pub surface: surface::EmissiveStaticI,
-}
-impl From<EmissiveStatic> for RenderOp {
-    fn from(x: EmissiveStatic) -> Self {
-        Self::DrawEmissiveStatic(x)
+    pub fn configs(&self) -> &FereConfigs {
+        &self.configs
     }
-}
 
-#[derive(Debug)]
-pub struct EmissiveDynamic {
-    /// The object
-    pub object: Object,
-
-    /// The material sources used to represent the surface
-    pub materials: surface::EmissiveMaterialI,
-
-    /// The surface to apply on the mesh.
-    pub surface: surface::EmissiveDynamic,
-}
-impl From<EmissiveDynamic> for RenderOp {
-    fn from(x: EmissiveDynamic) -> Self {
-        Self::DrawEmissiveDynamic(x)
+    /// Add a chamber.
+    ///
+    /// Returns error if it's not available to add a new chamber.
+    pub fn add_chamber(&mut self, config: ChamberConfig) -> Result<ChamberIndex, Error> {
+        let index = self
+            .chambers
+            .iter()
+            .position(|x| x.is_none())
+            .ok_or(Error::InvalidChamberAccess)?;
+        let config_ = config.clone();
+        self.chambers[index] = Some(Chamber {
+            config,
+            state: ChamberState {
+                current_probe: (IVec3::new(0, 0, 0), 0),
+                probe_volume_suite: ProbeVolumeSuite::new(
+                    config_.size,
+                    self.configs.pv_scale,
+                    self.configs.pv_resolution,
+                ),
+            },
+        });
+        Ok(index as ChamberIndex)
     }
-}
 
-#[derive(Debug)]
-pub struct Line {
-    pub pos1: Vec3,
-    pub pos2: Vec3,
-    pub color: IVec4,
-    pub width: f32,
-}
-impl From<Line> for RenderOp {
-    fn from(x: Line) -> Self {
-        Self::DrawLine(x)
+    /// Remove an existing chamber.
+    ///
+    /// Panics if there is no such chamber corresponding to the given index.
+    pub fn remove_chamber(&mut self, index: ChamberIndex) {
+        self.chambers
+            .get_mut(index as usize)
+            .ok_or(Error::InvalidChamberAccess)
+            .unwrap()
+            .take()
+            .ok_or(Error::InvalidChamberAccess)
+            .map(|_| ())
+            .unwrap()
     }
-}
 
-#[derive(Debug)]
-pub struct WireFrame {
-    /// The mesh to render.
-    pub mesh: Arc<Mesh>,
-
-    /// The model transformation.
-    pub trans: Mat4,
-
-    pub color: IVec4,
-    pub width: f32,
-}
-impl From<WireFrame> for RenderOp {
-    fn from(x: WireFrame) -> Self {
-        Self::DrawWireFrame(x)
-    }
-}
-
-#[derive(Debug)]
-/// A point light that involves shadows and some additional effects.
-pub struct MajorLight {
-    /// The position of the light.
-    pub pos: Vec3,
-
-    /// The color of the light.
-    pub color: Vec3,
-
-    /// The X axis in camera space
-    pub xdir: Vec3,
-
-    /// The Y axis in camera space
-    pub ydir: Vec3,
-
-    /// Camera perspective in radian.
-    pub perspective: f32,
-
-    /// The index of the chamber this light belongs to
-    pub chamber_index: ChamberIndex,
-}
-impl From<MajorLight> for RenderOp {
-    fn from(x: MajorLight) -> Self {
-        Self::AddMajorLight(x)
-    }
-}
-
-#[derive(Debug)]
-/// A major light which is omni-directional
-pub struct MajorLightOmni {
-    /// The position of the light.
-    pub pos: Vec3,
-
-    /// The color of the light.
-    pub color: Vec3,
-
-    /// The index of the chamber this light belongs to
-    pub chamber_index: ChamberIndex,
-}
-impl From<MajorLightOmni> for RenderOp {
-    fn from(x: MajorLightOmni) -> Self {
-        RenderOp::Multiple(
-            (0..6)
-                .map(|i| {
-                    let (xdir, ydir) = fere_common::geo::six_sides_dir(i);
-                    MajorLight {
-                        pos: x.pos,
-                        color: x.color,
-                        xdir,
-                        ydir,
-                        perspective: (90.0 as f32).to_radians(),
-                        chamber_index: x.chamber_index,
-                    }
-                    .into()
-                })
-                .collect(),
+    pub fn new_frame(&mut self, config: FrameConfig) -> (Frame, Renderer) {
+        let (send, recv): (OpQueueSender, OpQueueReceiver) = crossbeam::channel::unbounded();
+        (
+            Frame::new(config, send),
+            Renderer::new(
+                self.graphics.take().unwrap(),
+                recv,
+                Default::default(),
+                self.configs.clone(),
+                self.chambers
+                    .iter_mut()
+                    .map(|x| match x.take() {
+                        Some(x) => Some(x),
+                        None => None,
+                    })
+                    .collect(),
+            ),
         )
     }
-}
 
-#[derive(Debug)]
-/// A plain poing light
-pub struct PointLight {
-    /// The position of the light.
-    pub pos: Vec3,
-
-    /// The color of the light.
-    pub color: Vec3,
-
-    /// The index of the chamber this light belongs to
-    pub chamber_index: ChamberIndex,
-}
-impl From<PointLight> for RenderOp {
-    fn from(x: PointLight) -> Self {
-        Self::AddPointLight(x)
-    }
-}
-
-#[derive(Debug)]
-pub struct AmbientLight {
-    /// The color of the light.
-    pub color: Vec3,
-
-    /// Enabling omni-lighting.
-    pub omni: bool,
-
-    /// The index of the chamber this light belongs to
-    pub chamber_index: ChamberIndex,
-}
-impl From<AmbientLight> for RenderOp {
-    fn from(x: AmbientLight) -> Self {
-        Self::AddAmbientLight(x)
-    }
-}
-
-#[derive(Debug)]
-pub struct DrawImage {
-    pub texture: Arc<Texture>,
-    pub pos: Vec2,
-    pub size: Vec2,
-    pub rotation: f32,
-
-    pub blend_mode: (),
-    pub color: Vec3,
-}
-impl From<DrawImage> for RenderOp {
-    fn from(x: DrawImage) -> Self {
-        Self::DrawImage(x)
-    }
-}
-
-#[derive(Debug)]
-pub struct DrawBillboard {
-    pub texture: Arc<Texture>,
-    pub pos: Vec3,
-    pub size: Vec2,
-    pub rotation: f32,
-    pub blend_mode: (),
-    pub color: Vec3,
-}
-impl From<DrawBillboard> for RenderOp {
-    fn from(x: DrawBillboard) -> Self {
-        Self::DrawBillboard(x)
-    }
-}
-
-pub enum RenderOp {
-    // Internal opertions controlled by the frame
-    StartFrame(InternalOp),
-    Abort(InternalOp),
-    EndFrame(InternalOp),
-
-    // Special operations to configure the chamber
-    SetCamera(CameraInfo),
-
-    // Draw various objects
-    DrawLine(Line),
-    DrawWireFrame(WireFrame),
-    DrawGeneral(General),
-    DrawEmissiveStatic(EmissiveStatic),
-    DrawEmissiveDynamic(EmissiveDynamic),
-
-    // Add various lights
-    AddMajorLight(MajorLight),
-    AddPointLight(PointLight),
-    AddAmbientLight(AmbientLight),
-
-    // 2D Renderings
-    DrawImage(DrawImage),
-    DrawBillboard(DrawBillboard),
-
-    // Meta operations
-    Multiple(Vec<RenderOp>),
-}
-impl From<CameraInfo> for RenderOp {
-    fn from(x: CameraInfo) -> Self {
-        Self::SetCamera(x)
+    pub fn end_frame(&mut self, mut render_end: RenderEnd) {
+        render_end
+            .logs
+            .sort_by(|x, y| x.timestamp.cmp(&y.timestamp));
+        for log in render_end.logs.iter() {
+            println!("JRE: {}", log.to_string());
+        }
+        self.chambers = render_end.chambers;
+        assert!(
+            self.graphics.replace(render_end.graphics).is_none(),
+            "end_frame() called without new_frame()"
+        );
     }
 }
