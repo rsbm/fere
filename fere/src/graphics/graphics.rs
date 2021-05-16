@@ -223,11 +223,7 @@ impl Graphics {
             &Vec3::new((light.angle / 2.0).tan(), (light.angle / 2.0).tan(), 1.0),
         );
         trans = glm::translate(&trans, &Vec3::new(0.0, 0.0, 1.0));
-        trans = glm::rotate(
-            &trans,
-            (180.0 as f32).to_radians(),
-            &Vec3::new(1.0, 0.0, 0.0),
-        );
+        trans = glm::rotate(&trans, (180.0_f32).to_radians(), &Vec3::new(1.0, 0.0, 0.0));
         trans
     }
 

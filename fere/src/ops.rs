@@ -162,7 +162,7 @@ impl From<MajorLightOmni> for RenderOp {
                         color: x.color,
                         xdir,
                         ydir,
-                        perspective: (90.0 as f32).to_radians(),
+                        perspective: (90.0_f32).to_radians(),
                         chamber_index: x.chamber_index,
                     }
                     .into()

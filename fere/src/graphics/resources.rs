@@ -25,14 +25,13 @@ pub struct Meshes {
 
 impl Default for Meshes {
     fn default() -> Self {
-        let x = Self {
+        Self {
             square: read_mesh("square.obj"),
             square_coarse: read_mesh("square_coarse.obj"),
             sphere: read_mesh("sphere_low.obj"),
             pyramid: read_mesh("pyramid.obj"),
             cube: read_mesh("cube.obj"),
             line: read_mesh("line.obj"),
-        };
-        x
+        }
     }
 }

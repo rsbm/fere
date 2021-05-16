@@ -239,7 +239,6 @@ pub fn bind_fixed_color(prg: &Shader, color: &IVec4) {
         },
         alpha: TexVar::U(0),
     };
-
     bind_general(prg, &surface.general);
     bind_transparent(prg, &surface);
 }

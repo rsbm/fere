@@ -51,7 +51,7 @@ pub enum OpError {
 struct RenderContext {
     graphics: Graphics,
     params: RendererParams,
-    fere_configs: FereConfigs,
+    _fere_configs: FereConfigs,
     logs: Vec<FrameLog>,
     camera_info: Option<CameraInfo>,
     chamber_contexts: Vec<Option<ChamberContext>>,
@@ -136,7 +136,7 @@ impl Renderer {
         RenderContext {
             graphics: self.graphics.take().unwrap(),
             params: self.params.clone(),
-            fere_configs: self.fere_configs.clone(),
+            _fere_configs: self.fere_configs.clone(),
 
             camera_info: Default::default(),
             logs: Default::default(),

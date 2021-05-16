@@ -118,6 +118,7 @@ impl TextureInternal2D {
         }
     }
 
+    #[allow(dead_code)]
     pub fn load(&self, buf: &[f32]) {
         assert!(buf.len() >= (self.size.x as usize) * (self.size.y as usize) * self.tex_param.num);
         unsafe {
