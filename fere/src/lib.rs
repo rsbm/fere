@@ -15,6 +15,12 @@ use renderer::{RenderEnd, Renderer, RendererParams};
 use serde::Deserialize;
 use thiserror::Error;
 
+pub mod prelude {
+    pub use crate::{ops, renderer::Renderer, ChamberConfig, Error, Fere, FereConfigs, Frame};
+    pub use fere_common;
+    pub use fere_resources;
+}
+
 #[derive(Error, Debug)]
 pub enum Error {
     #[error("Invalid chamber accesses")]

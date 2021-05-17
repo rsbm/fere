@@ -3,5 +3,6 @@ members = [
     "fere",
     "resources",
     "common",
+    "window",
     "examples",
 ]
