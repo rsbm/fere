@@ -4,10 +4,8 @@ use glutin::{
     event_loop::{ControlFlow, EventLoop},
     window::WindowBuilder,
 };
-use imgui::{Context, FontConfig, FontGlyphRanges, FontSource};
-use imgui_winit_support::{HiDpiMode, WinitPlatform};
 use serde::Deserialize;
-
+use std::sync::Arc;
 #[derive(Debug, Clone, Deserialize)]
 pub struct WindowConfig {
     pub screen_size: IVec2,
@@ -16,7 +14,12 @@ pub struct WindowConfig {
     pub title: String,
 }
 
-pub fn run(config: WindowConfig) {
+pub trait Program: Send + Sync + 'static {
+    fn new() -> Self;
+    fn update(&mut self) -> String;
+}
+
+pub fn run<T: Program>(config: WindowConfig) {
     let event_loop = EventLoop::new();
     let _context = glutin::ContextBuilder::new().with_vsync(true);
 
@@ -49,4 +52,43 @@ pub fn run(config: WindowConfig) {
                 y: monitor_positions[config.monitor_index].1,
             },
         ));
+
+    let (main_window_gl, main_window) = unsafe { main_window.split() };
+    let mut main_window_gl = Some(main_window_gl);
+    let main_window = Arc::new(main_window);
+    let main_window_ = Arc::clone(&main_window);
+
+    let _redraw = std::thread::spawn(move || loop {
+        main_window_.request_redraw();
+        std::thread::sleep(std::time::Duration::from_micros(
+            (1.0 / 60.0 * 1000.0 * 1000.0) as u64,
+        ));
+    });
+
+    let mut program = T::new();
+
+    event_loop.run(move |event, _, control_flow| match event {
+        Event::RedrawRequested(window_id) => {
+            if window_id == main_window_id {
+                unsafe {
+                    main_window_gl = Some(main_window_gl.take().unwrap().make_current().unwrap());
+                }
+                let msg = program.update();
+                if msg.as_str() == "exit" {
+                    *control_flow = ControlFlow::Exit
+                }
+                main_window_gl.as_ref().unwrap().swap_buffers().unwrap();
+            } else {
+                unreachable!()
+            }
+        }
+        Event::WindowEvent {
+            event: WindowEvent::CloseRequested,
+            ..
+        } => *control_flow = ControlFlow::Exit,
+        Event::LoopDestroyed => {
+            main_window_gl.take().unwrap();
+        }
+        _ => (),
+    })
 }
