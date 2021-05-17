@@ -1,0 +1,8 @@
+---
+
+resolution: [1600, 900]
+shadow_resolution: 128
+probe_resolution: 64
+max_major_lights: 8
+max_chamber_num: 1024
+pv_scale: 10.0

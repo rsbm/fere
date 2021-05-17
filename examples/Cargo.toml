@@ -8,16 +8,9 @@ edition = '2018'
 serde = { version = "1.0", features = ["derive"] }
 serde_yaml = "0.8"
 fere = { path = "../fere" }
+fere-window = { path = "../window" }
 log = "0.4"
 chrono = "0.4"
 rand = "0.8"
 parking_lot = "0.11"
 crossbeam = "0.8"
-
-winit = "0.24"
-gl_generator = "0.14.0"
-gl = "0.14.0"
-glutin = "0.26"
-imgui = { git = "ssh://git@github.com/rsbm/imgui-rs.git" }
-imgui-winit-support = { git = "ssh://git@github.com/rsbm/imgui-rs.git", features = ["winit-24"]  }
-imgui-opengl-renderer = "0.7.0"

@@ -8,7 +8,7 @@ use crate::graphics::graphics::{Graphics, GraphicsConfig};
 use fere_common::geo::SixDir;
 use fere_common::vec::IteratorVec4;
 use fere_common::*;
-pub use frame::{Frame, FrameConfig};
+use frame::{Frame, FrameConfig};
 use frame::{OpQueueReceiver, OpQueueSender};
 use ops::ChamberIndex;
 use renderer::{RenderEnd, Renderer, RendererParams};
@@ -16,8 +16,9 @@ use serde::Deserialize;
 use thiserror::Error;
 
 pub mod prelude {
-    pub use crate::{ops, renderer::Renderer, ChamberConfig, Error, Fere, FereConfigs, Frame};
-    pub use fere_common;
+    pub use crate::frame::{Frame, FrameConfig};
+    pub use crate::{ops as rops, renderer::Renderer, ChamberConfig, Error, Fere, FereConfigs};
+    pub use fere_common::{self, *};
     pub use fere_resources;
 }
 
@@ -75,7 +76,6 @@ pub struct FereConfigs {
     pub max_chamber_num: usize,
 
     pub pv_scale: f32,
-    pub pv_resolution: usize,
 }
 
 /// The Fere instance.
@@ -127,7 +127,7 @@ impl Fere {
                 probe_volume_suite: ProbeVolumeSuite::new(
                     config_.size,
                     self.configs.pv_scale,
-                    self.configs.pv_resolution,
+                    self.configs.probe_resolution,
                 ),
             },
         });

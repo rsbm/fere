@@ -492,18 +492,12 @@ dependencies = [
  "chrono",
  "crossbeam",
  "fere",
- "gl",
- "gl_generator 0.14.0",
- "glutin",
- "imgui 0.7.0",
- "imgui-opengl-renderer",
- "imgui-winit-support",
+ "fere-window",
  "log",
  "parking_lot 0.11.1",
  "rand",
  "serde",
  "serde_yaml",
- "winit",
 ]
 
 [[package]]
