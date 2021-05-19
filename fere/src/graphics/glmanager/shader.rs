@@ -210,13 +210,11 @@ impl Shader {
         }
     }
 
-    pub fn uniform_line(&self, p1: &Vec3, p2: &Vec3, color: &IVec4, width: f32) {
+    pub fn uniform_line(&self, p1: &Vec3, p2: &Vec3, width: f32) {
         unsafe {
             gl::LineWidth(width);
             let trans = glm::translate(&Mat4::identity(), p1);
             let trans = glm::scale(&trans, &(p2 - p1));
-
-            self.uniform_color(color);
 
             let u: GLint;
             u = self.uloc[Uniform::Model as usize];

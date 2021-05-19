@@ -98,6 +98,21 @@ fn bind_general_(prg: &Shader, surface: &GeneralI) {
     }
 }
 
+pub fn bind_fixed_color(prg: &Shader, color: &IVec4) {
+    let surface = TransparentI {
+        general: GeneralI {
+            basecolor: TexVar::U(color.xyz()),
+            roughness: TexVar::U(0),
+            metalness: TexVar::U(0),
+            normal: no_normal_map(),
+        },
+        alpha: TexVar::U(0),
+    };
+
+    bind_general(prg, &surface.general);
+    bind_transparent(prg, &surface);
+}
+
 pub fn bind_general(prg: &Shader, surface: &GeneralI) {
     bind_general_(prg, surface);
     bind_no_emission(prg);
@@ -227,18 +242,4 @@ pub fn bind_simple_general(prg: &Shader, surface: &GeneralSimple) {
         Uniform::EmissionIntensityOn,
         Uniform::EmissionIntensity,
     );
-}
-
-pub fn bind_fixed_color(prg: &Shader, color: &IVec4) {
-    let surface = TransparentI {
-        general: GeneralI {
-            basecolor: TexVar::U(color.xyz()),
-            roughness: TexVar::U(0),
-            metalness: TexVar::U(0),
-            normal: no_normal_map(),
-        },
-        alpha: TexVar::U(0),
-    };
-    bind_general(prg, &surface.general);
-    bind_transparent(prg, &surface);
 }

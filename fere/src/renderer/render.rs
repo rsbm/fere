@@ -52,7 +52,8 @@ impl RenderContext {
                 // TODO: Don't look up everytime
                 let arr = &self.graphics.meshes().line;
                 arr.bind();
-                prg.uniform_line(&pos1, &pos2, &color, width);
+                bind_fixed_color(&prg, &color);
+                prg.uniform_line(&pos1, &pos2, width);
                 arr.draw_line();
                 Ok(None)
             }

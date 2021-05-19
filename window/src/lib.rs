@@ -21,7 +21,7 @@ pub trait Program: Send + Sync + 'static {
 
 pub fn run<T: Program>(config: WindowConfig) {
     let event_loop = EventLoop::new();
-    let _context = glutin::ContextBuilder::new().with_vsync(true);
+    let _context = glutin::ContextBuilder::new().with_vsync(false);
 
     let main_window = WindowBuilder::new()
         .with_title(config.title)
@@ -48,8 +48,8 @@ pub fn run<T: Program>(config: WindowConfig) {
         .window()
         .set_outer_position(winit::dpi::Position::Physical(
             winit::dpi::PhysicalPosition {
-                x: monitor_positions[config.monitor_index].0,
-                y: monitor_positions[config.monitor_index].1,
+                x: monitor_positions[config.monitor_index].0 + config.initial_window_pos.x,
+                y: monitor_positions[config.monitor_index].1 + config.initial_window_pos.y,
             },
         ));
 

@@ -45,14 +45,16 @@ impl GlManager {
         let mut programs = HashMap::new();
 
         for (name, vert, frag) in programs_list {
+            let vert = get_shader_path(&vert);
+            let frag = get_shader_path(&frag);
             programs.insert(
                 name.clone(),
                 Arc::new(Shader::new(
                     name,
                     &read_to_string(vert.clone()).unwrap(),
-                    &vert,
+                    vert.to_str().unwrap(),
                     &read_to_string(frag.clone()).unwrap(),
-                    &frag,
+                    frag.to_str().unwrap(),
                 )),
             );
         }

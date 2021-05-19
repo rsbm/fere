@@ -10,7 +10,7 @@ use crate::frame::OpQueueReceiver;
 use crate::graphics::glmanager::light::{Light, LightDir, LightUni};
 use crate::graphics::glmanager::shader::Shader;
 use crate::graphics::graphics::{
-    material::{bind_emissive_static, bind_general, bind_simple_general},
+    material::{bind_emissive_static, bind_fixed_color, bind_general},
     texture_internal::{InternalTexType, TextureInternal2D, TextureInternal3D},
     Graphics,
 };

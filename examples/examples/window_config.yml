@@ -1,6 +1,6 @@
 ---
 
 screen_size: [1600, 900]
-initial_window_pos: [0, 0]
-monitor_index: 0
+initial_window_pos: [400, 400]
+monitor_index: 2
 title: "fere-example"
