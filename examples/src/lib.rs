@@ -1,6 +1,13 @@
-use fere::prelude::*;
+use fere::prelude::{
+    fere_resources::{Mesh, Texture},
+    *,
+};
 use rand::prelude::*;
 use rops::*;
+use std::fs::File;
+use std::io::BufReader;
+use std::path::PathBuf;
+use std::sync::Arc;
 
 pub fn draw_grid(
     color: IVec4,
@@ -73,4 +80,27 @@ pub fn gen_color() -> IVec3 {
         .unwrap();
     let color = color * (1.0 / max) * 255.0;
     IVec3::new(color.x as i32, color.y as i32, color.z as i32)
+}
+
+pub fn read_mesh(name: &str) -> Arc<Mesh> {
+    let mut path = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
+    path.push(format!("resources/meshes/{}", name));
+    let file = File::open(path).unwrap();
+    let mesh_data = fere_resources::mesh::obj::import_single(name, BufReader::new(file)).unwrap();
+    let mut mesh = Mesh::new(None, mesh_data);
+    mesh.buffer();
+    Arc::new(mesh)
+}
+
+pub fn read_texture(name: &str) -> Arc<Texture> {
+    let mut path = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
+    path.push(format!("resources/textures/{}", name));
+    let texture_data = fere_resources::texture::import(&name, {
+        let file = File::open(path).unwrap();
+        BufReader::new(file)
+    })
+    .unwrap();
+    let mut texture = Texture::new(None, texture_data);
+    texture.buffer();
+    Arc::new(texture)
 }
