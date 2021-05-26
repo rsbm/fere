@@ -1,0 +1,17 @@
+---
+room_size: [100.0, 80.0, 70.0]
+
+glowing_cuboid_bpos: [30.0, 8.0, 40.0]
+glowing_cuboid_size: [13.0, 13.0, 13.0]
+glowing_cuboid_rotate: 20.0
+
+metal_sphere_pos: [-30.0, 20.0, 17.0]
+metal_sphere_radius: 17.0
+
+clay_cuboid_bpos: [0.0, -16.0, 0.0]
+clay_cuboid_size: [7.0, 5.0, 60.0]
+clay_cuboid_rotate: 0.0
+
+ceramic_cuboid_bpos: [-27.0, -30.0, 0.0]
+ceramic_cuboid_size: [10.0, 6.0, 30.0]
+ceramic_cuboid_rotate: -45.0

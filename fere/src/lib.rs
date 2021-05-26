@@ -148,6 +148,10 @@ impl Fere {
             .unwrap()
     }
 
+    pub fn fetch_index_buffer(_pos: IVec2) -> u64 {
+        0
+    }
+
     pub fn new_frame(&mut self, config: FrameConfig) -> (Frame, Renderer) {
         let (send, recv): (OpQueueSender, OpQueueReceiver) = crossbeam::channel::unbounded();
         (

@@ -9,6 +9,7 @@ serde = { version = "1.0", features = ["derive"] }
 serde_yaml = "0.8"
 fere = { path = "../fere" }
 fere-window = { path = "../window" }
+fere-util = { path = "../util"}
 log = "0.4"
 chrono = "0.4"
 rand = "0.8"

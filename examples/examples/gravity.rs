@@ -89,7 +89,7 @@ impl World {
 
 impl Program for Scene {
     fn new() -> Self {
-        let mut renderer = Fere::new(
+        let renderer = Fere::new(
             serde_yaml::from_str(
                 &std::fs::read_to_string("./examples/examples/basic_fere_configs.yml").unwrap(),
             )

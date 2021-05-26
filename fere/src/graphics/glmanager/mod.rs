@@ -24,8 +24,6 @@ pub struct GlManager {
     programs: HashMap<String, Arc<Shader>>,
 }
 
-const ERROR_MSG: &str = "Failed to read shaders. Fatal Error";
-
 impl GlManager {
     pub fn new(_name: String) -> Self {
         unsafe {

@@ -492,6 +492,7 @@ dependencies = [
  "chrono",
  "crossbeam",
  "fere",
+ "fere-util",
  "fere-window",
  "log",
  "parking_lot 0.11.1",
@@ -509,6 +510,23 @@ dependencies = [
  "gl",
  "image",
  "serde",
+]
+
+[[package]]
+name = "fere-util"
+version = "0.0.0"
+dependencies = [
+ "chrono",
+ "crossbeam",
+ "fere",
+ "fere-window",
+ "glutin",
+ "imgui 0.7.0",
+ "log",
+ "parking_lot 0.11.1",
+ "rand",
+ "serde",
+ "serde_yaml",
 ]
 
 [[package]]

@@ -104,3 +104,14 @@ pub fn read_texture(name: &str) -> Arc<Texture> {
     texture.buffer();
     Arc::new(texture)
 }
+
+pub fn calc_ori_for_cuboid(bpos: Vec3, size: Vec3, rotate: f32) -> Ori {
+    let x_angle = rotate.to_radians();
+    let y_angle = (rotate + 90.0).to_radians();
+    Ori::new(
+        Vec3::new(bpos.x, bpos.y, bpos.z + size.z / 2.0),
+        size,
+        Vec3::new(x_angle.cos(), x_angle.sin(), 0.0),
+        Vec3::new(y_angle.cos(), y_angle.sin(), 0.0),
+    )
+}

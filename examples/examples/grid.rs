@@ -1,5 +1,4 @@
 use fere::prelude::*;
-use fere_common::*;
 use fere_window::*;
 struct Scene {
     renderer: Fere,

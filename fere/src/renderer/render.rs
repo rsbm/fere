@@ -49,7 +49,6 @@ impl RenderContext {
                     lighting: Some(Lighting::DefFixed),
                 };
                 self.graphics.ru_set(prg, &runit);
-                // TODO: Don't look up everytime
                 let arr = &self.graphics.meshes().line;
                 arr.bind();
                 bind_fixed_color(&prg, &color);
@@ -145,7 +144,7 @@ impl RenderContext {
                         Some(RenderOp::DrawWireFrame(WireFrame {
 						mesh: Arc::clone(&self.graphics.meshes().pyramid),
 						trans: crate::graphics::graphics::Graphics::get_transform_for_lightvolume_dir(&light),
-						color: IVec4::new(255, 255, 255 ,255),
+						color: IVec4::new(0, 255, 255 ,255),
 						width: 1.0,
 					}))
                     } else {

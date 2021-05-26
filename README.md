@@ -14,5 +14,5 @@ cargo clippy --all --all-targets --release
 To run example,
 
 ```
-cargo run -p fere-examples --example grid --release
+cargo run --release -p fere-examples --example grid 
 ```
