@@ -1,30 +1,47 @@
 use fere::prelude::*;
-use fere_resources::surface::{no_normal_map, GeneralI, TexVar};
+use fere_resources::surface::{no_normal_map, EmissiveStaticI, GeneralI, TexVar, TimepointI};
 use fere_resources::Mesh;
 use fere_util::ui::camera_control::CameraControl;
 use fere_util::ui::input_manager::InputManager;
 use fere_window::*;
+use rand::prelude::*;
 use rops::*;
 use std::sync::Arc;
 
 #[derive(Debug, serde::Deserialize)]
 struct SceneParams {
     room_size: Vec3,
+    glowing_spheres_n: usize,
 
-    glowing_cuboid_bpos: Vec3,
-    glowing_cuboid_size: Vec3,
-    glowing_cuboid_rotate: f32,
+    fere_configs: FereConfigs,
+}
 
-    metal_sphere_pos: Vec3,
-    metal_sphere_radius: f32,
+struct SceneState {
+    /// Pos, color, intensity, radius
+    spheres: Vec<(Vec3, IVec3, u8, f32)>,
+}
 
-    clay_cuboid_bpos: Vec3,
-    clay_cuboid_size: Vec3,
-    clay_cuboid_rotate: f32,
+impl SceneState {
+    fn new(params: &SceneParams) -> Self {
+        let mut rng = thread_rng();
+        let mut spheres = Vec::new();
 
-    ceramic_cuboid_bpos: Vec3,
-    ceramic_cuboid_size: Vec3,
-    ceramic_cuboid_rotate: f32,
+        let (min_radius, max_radius) = (3.0, 10.0);
+        for _ in 0..params.glowing_spheres_n {
+            let mut pos = Vec3::new(0.0, 0.0, 0.0);
+            for i in 0..3 {
+                pos[i] = rng.gen_range((-params.room_size[i] / 2.0)..(params.room_size[i] / 2.0));
+            }
+            pos[2] += params.room_size[2] * 0.5;
+            spheres.push((
+                pos,
+                fere_examples::gen_color(),
+                rng.gen_range(0..255),
+                rng.gen_range(min_radius..max_radius),
+            ));
+        }
+        Self { spheres }
+    }
 }
 
 struct Scene {
@@ -32,8 +49,9 @@ struct Scene {
     input_manager: InputManager,
     camera_control: CameraControl,
     timer: u64,
-    params: Arc<SceneParams>,
     resources: Arc<Resources>,
+    params: Arc<SceneParams>,
+    state: Arc<SceneState>,
 }
 
 struct Resources {
@@ -44,16 +62,12 @@ struct Resources {
 
 impl ProgramWithImgui for Scene {
     fn new() -> Self {
-        let mut renderer = Fere::new(
-            serde_yaml::from_str(
-                &std::fs::read_to_string("./examples/examples/basic_fere_configs.yml").unwrap(),
-            )
-            .unwrap(),
-        );
         let params: SceneParams = serde_yaml::from_str(
-            &std::fs::read_to_string("./examples/examples/scene1.yml").unwrap(),
+            &std::fs::read_to_string("./examples/examples/scene2.yml").unwrap(),
         )
         .unwrap();
+        let mut renderer = Fere::new(params.fere_configs.clone());
+
         renderer
             .add_chamber(ChamberConfig {
                 bpos: Vec3::zeros(),
@@ -70,6 +84,7 @@ impl ProgramWithImgui for Scene {
             input_manager: InputManager::new(screen_size),
             camera_control,
             timer: 0,
+            state: Arc::new(SceneState::new(&params)),
             params: Arc::new(params),
             resources: Arc::new(Resources {
                 cube_map_coarse: fere_examples::read_mesh("cube_map_coarse.obj"),
@@ -98,15 +113,22 @@ impl ProgramWithImgui for Scene {
 
         let (frame, renderer) = self.renderer.new_frame(FrameConfig {
             camera,
-            show_lightvolume_outline: true,
+            show_lightvolume_outline: false,
         });
 
         let timer = self.timer;
         let scene_params = Arc::clone(&self.params);
+        let scene_state = Arc::clone(&self.state);
         let resources = Arc::clone(&self.resources);
 
         let render_thread = std::thread::spawn(move || {
-            render(frame, timer, scene_params.as_ref(), resources.as_ref())
+            render(
+                frame,
+                timer,
+                scene_params.as_ref(),
+                scene_state.as_ref(),
+                resources.as_ref(),
+            )
         });
         self.renderer.end_frame(renderer.render());
         render_thread.join().unwrap();
@@ -117,7 +139,13 @@ impl ProgramWithImgui for Scene {
     }
 }
 
-fn render(mut frame: Frame, timer: u64, params: &SceneParams, resources: &Resources) {
+fn render(
+    mut frame: Frame,
+    timer: u64,
+    params: &SceneParams,
+    state: &SceneState,
+    resources: &Resources,
+) {
     let color = IVec4::new(255, 255, 255, 255);
     let xcolor = IVec4::new(255, 255, 0, 255);
     let ycolor = IVec4::new(0, 255, 255, 255);
@@ -156,66 +184,17 @@ fn render(mut frame: Frame, timer: u64, params: &SceneParams, resources: &Resour
         surface,
     });
 
-    // Draw a metal sphere
-    let mesh = Arc::clone(&resources.sphere);
-    let ori = Ori::new(
-        params.metal_sphere_pos,
-        Vec3::from_element(params.metal_sphere_radius),
-        Vec3::new(1.0, 0.0, 0.0),
-        Vec3::new(0.0, 1.0, 0.0),
-    );
-    let surface = GeneralI {
-        basecolor: TexVar::U(IVec3::new(200, 200, 255)),
-        roughness: TexVar::U(20),
-        metalness: TexVar::U(240),
-        normal: no_normal_map(),
-    };
-    frame.push(General {
-        object: Object {
-            mesh: Arc::clone(&mesh),
-            shadow: true,
-            irradiance_volume: false,
-            trans: *ori.trans(),
-            chamber_index: 0,
-        },
-        surface,
-    });
-
-    // Draw a glowing cube
+    // Draw a wall
     let mesh = Arc::clone(&resources.cube);
     let ori = fere_examples::calc_ori_for_cuboid(
-        params.glowing_cuboid_bpos,
-        params.glowing_cuboid_size,
-        params.glowing_cuboid_rotate,
-    );
-    let surface = GeneralI {
-        basecolor: TexVar::U(IVec3::new(200, 200, 200)),
-        roughness: TexVar::U(60),
-        metalness: TexVar::U(20),
-        normal: no_normal_map(),
-    };
-    frame.push(General {
-        object: Object {
-            mesh,
-            shadow: false,
-            irradiance_volume: false,
-            trans: *ori.trans(),
-            chamber_index: 0,
-        },
-        surface,
-    });
-
-    // Draw a non-metal cube
-    let mesh = Arc::clone(&resources.cube);
-    let ori = fere_examples::calc_ori_for_cuboid(
-        params.clay_cuboid_bpos,
-        params.clay_cuboid_size,
-        params.clay_cuboid_rotate,
+        Vec3::new(0.0, 0.0, 0.0),
+        Vec3::new(2.0, 50.0, 50.0),
+        0.0,
     );
     let surface = GeneralI {
         basecolor: TexVar::U(IVec3::new(200, 150, 200)),
-        roughness: TexVar::U(150),
-        metalness: TexVar::U(0),
+        roughness: TexVar::U(30),
+        metalness: TexVar::U(200),
         normal: no_normal_map(),
     };
     frame.push(General {
@@ -229,32 +208,47 @@ fn render(mut frame: Frame, timer: u64, params: &SceneParams, resources: &Resour
         surface,
     });
 
-    // Add lights
+    // Draw spheres
+    let mesh = Arc::clone(&resources.sphere);
+    for (pos, color, intensity, radius) in state.spheres.iter() {
+        let ori = Ori::new(
+            *pos,
+            Vec3::from_element(*radius),
+            Vec3::new(1.0, 0.0, 0.0),
+            Vec3::new(0.0, 1.0, 0.0),
+        );
+        let surface = EmissiveStaticI::with_uniform_timepoints(
+            GeneralI {
+                basecolor: TexVar::U(IVec3::new(200, 200, 255)),
+                roughness: TexVar::U(20),
+                metalness: TexVar::U(240),
+                normal: no_normal_map(),
+            },
+            TimepointI {
+                emission: TexVar::U(*color),
+                emission_intensity: TexVar::U(*intensity),
+                smoothness: 1.0,
+            },
+        );
+        frame.push(EmissiveStatic {
+            object: Object {
+                mesh: Arc::clone(&mesh),
+                shadow: true,
+                irradiance_volume: false,
+                trans: *ori.trans(),
+                chamber_index: 0,
+            },
+            surface,
+        });
+    }
+
     frame.push(AmbientLight {
         color: Vec3::new(0.05, 0.05, 0.05),
         omni: true,
         chamber_index: 0,
     });
 
-    let r = timer as f32 * 0.01;
-    let pos = Vec3::new(
-        -params.room_size.x / 2.0 + 1.0,
-        -params.room_size.y / 2.0 + 1.0,
-        params.room_size.z - 1.0,
-    );
-    let look_pos = Vec3::new(r.cos() * 10.0, r.sin() * 10.0, (r * 0.7).sin() * 8.0 + 8.0);
-    let look_dir = normalize(&(look_pos - pos));
-    let xdir = normalize(&glm::cross(&look_dir, &Vec3::new(0.0, 0.0, 1.0)));
-    let ydir = normalize(&glm::cross(&xdir, &look_dir));
-
-    frame.push(MajorLight {
-        pos,
-        color: Vec3::new(1000.0, 0.0, 0.0),
-        xdir,
-        ydir,
-        perspective: (40.0_f32).to_radians(),
-        chamber_index: 0,
-    });
+    frame.push(VisualizeProbes { chamber_index: 0 });
 
     frame.end();
 }

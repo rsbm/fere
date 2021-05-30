@@ -139,7 +139,11 @@ impl ProbeVolume {
                         rng.gen_range(-1.0..1.0),
                         rng.gen_range(-1.0..1.0),
                     ),
-                    Vec3::new(0.0, 0.0, 0.0),
+                    Vec3::new(
+                        rng.gen_range(-1.0..1.0),
+                        rng.gen_range(-1.0..1.0),
+                        rng.gen_range(-1.0..1.0),
+                    ),
                     rng.gen_range(0.0..1.0),
                 );
             }

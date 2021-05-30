@@ -238,6 +238,16 @@ impl From<DrawBillboard> for RenderOp {
     }
 }
 
+#[derive(Debug)]
+pub struct VisualizeProbes {
+    pub chamber_index: ChamberIndex,
+}
+impl From<VisualizeProbes> for RenderOp {
+    fn from(x: VisualizeProbes) -> Self {
+        Self::VisualizeProbes(x)
+    }
+}
+
 pub enum RenderOp {
     // Internal opertions controlled by the frame
     StartFrame(InternalOp),
@@ -262,6 +272,9 @@ pub enum RenderOp {
     // 2D Renderings
     DrawImage(DrawImage),
     DrawBillboard(DrawBillboard),
+
+    // Various debugging tools
+    VisualizeProbes(VisualizeProbes),
 
     // Meta operations
     Multiple(Vec<RenderOp>),

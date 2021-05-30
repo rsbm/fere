@@ -167,6 +167,33 @@ impl RenderContext {
                     .push(x);
                 Ok(None)
             }
+            RenderOp::VisualizeProbes(c) => {
+                let chamber = self.get_chamber_ctx(c.chamber_index)?;
+                let probes = chamber
+                    .chamber
+                    .state
+                    .probe_volume_suite
+                    .probe_volume()
+                    .probes();
+
+                let prg = self.graphics.prgs.sh_visualize_single.as_ref();
+                prg.bind();
+                let mesh = &self.graphics.meshes().sphere;
+                mesh.bind();
+
+                for probe in probes {
+                    let sh: Vec<Vec3> = probe.sh.iter().map(|x| x.1).collect();
+                    prg.uniform_sh(&sh);
+                    prg.uniform_model_s(
+                        &probe.pos,
+                        &Mat4::identity(),
+                        &Vec3::new(4.0, 4.0, 4.0),
+                        false,
+                    );
+                    mesh.draw()
+                }
+                Ok(None)
+            }
             RenderOp::DrawImage(x) => {
                 self.draw_images.push(x);
                 Ok(None)

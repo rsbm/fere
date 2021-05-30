@@ -126,7 +126,10 @@ impl Program for Scene {
         );
         camera.trans();
 
-        let (frame, renderer) = self.renderer.new_frame(FrameConfig { camera });
+        let (frame, renderer) = self.renderer.new_frame(FrameConfig {
+            camera,
+            show_lightvolume_outline: false,
+        });
 
         let resources = Arc::clone(&self.resources);
         let world = Arc::clone(&self.world);

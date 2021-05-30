@@ -134,8 +134,7 @@ pub struct GridAccessor3(pub IVec3);
 impl GridAccessor3 {
     pub fn get(&self, p: &IVec3) -> usize {
         if p.x < 0 || p.y < 0 || p.z < 0 || p.x >= self.0.x || p.y > self.0.y || p.z >= self.0.z {
-            debug_assert!(false, "invalid grid access");
-            0
+            panic!("invalid grid access: {:?} out of {:?}", p, self.0);
         } else {
             (p.x * self.0.y * self.0.z + p.y * self.0.z + p.z) as usize
         }

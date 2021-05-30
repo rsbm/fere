@@ -24,10 +24,6 @@ pub fn calculate_sh_cache(fb_size: usize, param: usize) -> [Vec<Vec<f32>>; 6] {
                     1.0,
                 );
                 let p = normalize(&(six_sides(i as SixDir) * q).xyz());
-                if x == fb_size / 2 && y == fb_size / 2 {
-                    println!("{}", p);
-                }
-
                 let mut table = Mat3::from_element(0.0);
                 for m in 0..3 {
                     for n in 0..3 {

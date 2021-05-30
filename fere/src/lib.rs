@@ -1,3 +1,4 @@
+mod configs;
 mod frame;
 mod graphics;
 pub mod ops;
@@ -5,6 +6,7 @@ mod renderer;
 
 use crate::graphics::gi::probe_volume::ProbeVolumeSuite;
 use crate::graphics::graphics::{Graphics, GraphicsConfig};
+use configs::FereConfigs;
 use fere_common::geo::SixDir;
 use fere_common::vec::IteratorVec4;
 use fere_common::*;
@@ -12,12 +14,12 @@ use frame::{Frame, FrameConfig};
 use frame::{OpQueueReceiver, OpQueueSender};
 use ops::ChamberIndex;
 use renderer::{RenderEnd, Renderer, RendererParams};
-use serde::Deserialize;
 use thiserror::Error;
 
 pub mod prelude {
+    pub use crate::configs::FereConfigs;
     pub use crate::frame::{Frame, FrameConfig};
-    pub use crate::{ops as rops, renderer::Renderer, ChamberConfig, Error, Fere, FereConfigs};
+    pub use crate::{ops as rops, renderer::Renderer, ChamberConfig, Error, Fere};
     pub use fere_common::{self, *};
     pub use fere_resources;
 }
@@ -45,14 +47,14 @@ impl ChamberState {
         let mut i = IteratorVec4 {
             size: IVec4::new(6, num.x, num.y, num.z),
             cur: IVec4::new(
+                self.current_probe.1 as i32,
                 self.current_probe.0.x,
                 self.current_probe.0.y,
                 self.current_probe.0.z,
-                self.current_probe.1 as i32,
             ),
         };
         self.current_probe = if let Some(x) = i.next() {
-            (IVec3::new(x.w, x.z, x.y), x.x as i8)
+            (IVec3::new(x.y, x.z, x.w), x.x as i8)
         } else {
             (IVec3::new(0, 0, 0), 0)
         };
@@ -62,20 +64,6 @@ impl ChamberState {
 pub struct Chamber {
     config: ChamberConfig,
     state: ChamberState,
-}
-
-/// Configurations for a Fere Instance, required only once for the initial creation.
-#[derive(Clone, Debug, Deserialize)]
-pub struct FereConfigs {
-    pub resolution: IVec2,
-
-    pub shadow_resolution: usize,
-    pub probe_resolution: usize,
-    pub max_major_lights: usize,
-
-    pub max_chamber_num: usize,
-
-    pub pv_scale: f32,
 }
 
 /// The Fere instance.
@@ -154,22 +142,21 @@ impl Fere {
 
     pub fn new_frame(&mut self, config: FrameConfig) -> (Frame, Renderer) {
         let (send, recv): (OpQueueSender, OpQueueReceiver) = crossbeam::channel::unbounded();
-        (
-            Frame::new(config, send),
-            Renderer::new(
-                self.graphics.take().unwrap(),
-                recv,
-                Default::default(),
-                self.configs.clone(),
-                self.chambers
-                    .iter_mut()
-                    .map(|x| match x.take() {
-                        Some(x) => Some(x),
-                        None => None,
-                    })
-                    .collect(),
-            ),
-        )
+
+        let renderer = Renderer::new(
+            self.graphics.take().unwrap(),
+            recv,
+            create_renderer_param(&self.configs, &config),
+            self.configs.clone(),
+            self.chambers
+                .iter_mut()
+                .map(|x| match x.take() {
+                    Some(x) => Some(x),
+                    None => None,
+                })
+                .collect(),
+        );
+        (Frame::new(config, send), renderer)
     }
 
     pub fn end_frame(&mut self, mut render_end: RenderEnd) {
@@ -177,12 +164,20 @@ impl Fere {
             .logs
             .sort_by(|x, y| x.timestamp.cmp(&y.timestamp));
         for log in render_end.logs.iter() {
-            println!("JRE: {}", log.to_string());
+            println!("Fere: {}", log.to_string());
         }
         self.chambers = render_end.chambers;
         assert!(
             self.graphics.replace(render_end.graphics).is_none(),
             "end_frame() called without new_frame()"
         );
+    }
+}
+
+fn create_renderer_param(configs: &FereConfigs, frame_configs: &FrameConfig) -> RendererParams {
+    RendererParams {
+        debug_lightvolume_outline: frame_configs.show_lightvolume_outline,
+        enable_shadow: true,
+        enable_irradiance_volume: configs.irradiance_volume.is_some(),
     }
 }

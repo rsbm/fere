@@ -35,7 +35,10 @@ impl Program for Scene {
         );
         camera.trans();
 
-        let (frame, renderer) = self.renderer.new_frame(FrameConfig { camera });
+        let (frame, renderer) = self.renderer.new_frame(FrameConfig {
+            camera,
+            show_lightvolume_outline: false,
+        });
         let render_thread = std::thread::spawn(|| render(frame));
         self.renderer.end_frame(renderer.render());
         render_thread.join().unwrap();

@@ -42,7 +42,6 @@ impl RenderContext {
         let chamber = self.chamber_contexts[chamber_index as usize]
             .as_mut()
             .unwrap();
-        #[cfg(never)]
         unsafe {
             chamber
                 .chamber

@@ -9,6 +9,9 @@ pub(crate) type OpQueueReceiver = crossbeam::channel::Receiver<RenderOp>;
 /// You must provide this for the every frames you're rendering. (e.g 60 times in a sec)
 pub struct FrameConfig {
     pub camera: CameraInfo,
+
+    /// For a debug purpose, show the outlines of light volumes.
+    pub show_lightvolume_outline: bool,
 }
 
 pub struct Frame {
