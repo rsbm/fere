@@ -34,6 +34,13 @@ impl FrameLog {
             log: err.to_string(),
         }
     }
+
+    pub fn new(log: String) -> Self {
+        Self {
+            timestamp: chrono::Utc::now(),
+            log
+        }
+    }
 }
 
 impl std::fmt::Display for FrameLog {
@@ -58,6 +65,7 @@ struct RenderContext {
 
     draw_images: Vec<DrawImage>,
     draw_billboarsd: Vec<DrawBillboard>,
+    show_internal_textures: Vec<ShowInternalTexture>,
 }
 
 impl RenderContext {
@@ -150,6 +158,7 @@ impl Renderer {
                 .collect(),
             draw_images: Default::default(),
             draw_billboarsd: Default::default(),
+            show_internal_textures: Default::default(),
         }
     }
 

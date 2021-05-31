@@ -248,6 +248,18 @@ impl From<VisualizeProbes> for RenderOp {
     }
 }
 
+#[derive(Debug)]
+pub struct ShowInternalTexture {
+    pub name: String,
+    pub pos: Vec2,
+    pub size: Vec2
+}
+impl From<ShowInternalTexture> for RenderOp {
+    fn from(x: ShowInternalTexture) -> Self {
+        Self::ShowInternalTexture(x)
+    }
+}
+
 pub enum RenderOp {
     // Internal opertions controlled by the frame
     StartFrame(InternalOp),
@@ -275,6 +287,7 @@ pub enum RenderOp {
 
     // Various debugging tools
     VisualizeProbes(VisualizeProbes),
+    ShowInternalTexture(ShowInternalTexture),
 
     // Meta operations
     Multiple(Vec<RenderOp>),

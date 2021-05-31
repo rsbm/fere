@@ -32,6 +32,25 @@ impl RenderContext {
             arr.draw();
         }
 
+        for tex in &self.show_internal_textures {
+            match tex.name.as_str() {
+                "iv_illusion" => {
+                },
+                other => {
+                    self.logs.push(FrameLog::new(format!("Invalid internal texture name: {}", other)));
+                } 
+            }
+        }
+
+
+        let runit = RenderUnit {
+            color: true,
+            depth: true,
+            depth_test: true,
+            id: None,
+            lighting: None,
+        };
+        self.graphics.ru_set(prg, &runit);
         // TODO: filter by boundary
         let screen_size: Vec2 = nalgebra::convert(self.graphics.screen_size());
         let camera = self

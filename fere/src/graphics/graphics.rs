@@ -314,3 +314,10 @@ impl Graphics {
         pass::bind_2d(self)
     }
 }
+
+// Various debug-purpose backdoors
+impl Graphics {
+    pub fn get_irradiance_volume_tex(&self) -> u32 {
+        self.pass_probe.outputs_get()[1].tex_get().raw_get()
+    }
+}

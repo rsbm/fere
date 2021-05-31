@@ -202,6 +202,10 @@ impl RenderContext {
                 self.draw_billboarsd.push(x);
                 Ok(None)
             }
+            RenderOp::ShowInternalTexture(x) => {
+                self.show_internal_textures.push(x);
+                Ok(None)
+            }
             _ => unimplemented!(),
         }
     }
