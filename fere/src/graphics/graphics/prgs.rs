@@ -12,6 +12,7 @@ pub struct Programs {
     pub debug_test: Arc<Shader>,
     pub debug_iden: Arc<Shader>,
     pub debug_depth: Arc<Shader>,
+    pub debug_3vec: Arc<Shader>,
 
     pub basic: Arc<Shader>,
     pub standard: Arc<Shader>,
@@ -41,6 +42,7 @@ impl Programs {
             debug_test: glmanager.get_program("debug_test"),
             debug_iden: glmanager.get_program("debug_iden"),
             debug_depth: glmanager.get_program("debug_depth"),
+            debug_3vec: glmanager.get_program("debug_3vec"),
 
             basic: glmanager.get_program("basic"),
             standard: glmanager.get_program("standard"),

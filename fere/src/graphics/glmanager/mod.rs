@@ -19,7 +19,6 @@ fn get_shader_path(path: &str) -> PathBuf {
     path_to_shader.push(format!("shaders/{}", path));
     path_to_shader
 }
-
 pub struct GlManager {
     programs: HashMap<String, Arc<Shader>>,
 }
@@ -37,12 +36,12 @@ impl GlManager {
             }
         }
 
-        let programs_list: Vec<(String, String, String)> =
+        let programs_: HashMap<String, (String, String)> =
             serde_yaml::from_str(&read_to_string(get_shader_config_path()).unwrap()).unwrap();
 
         let mut programs = HashMap::new();
 
-        for (name, vert, frag) in programs_list {
+        for (name, (vert, frag)) in programs_ {
             let vert = get_shader_path(&vert);
             let frag = get_shader_path(&frag);
             programs.insert(

@@ -38,7 +38,7 @@ impl FrameLog {
     pub fn new(log: String) -> Self {
         Self {
             timestamp: chrono::Utc::now(),
-            log
+            log,
         }
     }
 }

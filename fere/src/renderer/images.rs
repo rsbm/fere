@@ -32,16 +32,37 @@ impl RenderContext {
             arr.draw();
         }
 
+        let prg = self.graphics.prgs.debug_3vec.as_ref();
+        prg.bind();
+        let arr = &self.graphics.meshes().square;
+        arr.bind();
         for tex in &self.show_internal_textures {
             match tex.name.as_str() {
-                "iv_illusion" => {
-                },
+                "normal" => {
+                    let (tex_raw, tex_size) = self.graphics.get_gbuffer_normal();
+                    prg.uniform_texture(0, tex_raw);
+                    let image_size: Vec2 = nalgebra::convert(tex_size);
+                    let pos = tex.pos.component_div(&screen_size) - Vec2::new(1.0, 1.0);
+                    let size = tex
+                        .size
+                        .component_mul(&image_size)
+                        .component_div(&screen_size)
+                        * 2.0;
+                    let trans = glm::translate(&Mat4::identity(), &Vec3::new(pos.x, pos.y, 0.0));
+                    let trans = glm::scale(&trans, &Vec3::new(size.x, size.y, 1.0));
+                    let trans = glm::translate(&trans, &Vec3::new(0.5, 0.5, 0.0));
+                    prg.uniform_model(&trans, false);
+                    arr.draw();
+                }
+                "iv_illuminatiion" => {}
                 other => {
-                    self.logs.push(FrameLog::new(format!("Invalid internal texture name: {}", other)));
-                } 
+                    self.logs.push(FrameLog::new(format!(
+                        "Invalid internal texture name: {}",
+                        other
+                    )));
+                }
             }
         }
-
 
         let runit = RenderUnit {
             color: true,

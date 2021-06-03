@@ -315,6 +315,14 @@ impl Shader {
         }
     }
 
+    pub fn uniform_texture(&self, index: usize, tex: u32) {
+        unsafe {
+            gl::ActiveTexture(gl::TEXTURE0 + index as GLenum);
+            gl::BindTexture(gl::TEXTURE_2D, tex);
+            gl::Uniform1i(self.uloc_get_tex()[index], index as i32)
+        }
+    }
+
     pub fn bind(&self) -> &Self {
         debug_assert_ne!(self.name, "NULL");
         unsafe {

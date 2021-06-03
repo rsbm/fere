@@ -250,6 +250,12 @@ fn render(
 
     frame.push(VisualizeProbes { chamber_index: 0 });
 
+    frame.push(ShowInternalTexture {
+        name: "normal".to_owned(),
+        pos: Vec2::new(0.0, 0.0),
+        size: Vec2::new(0.1, 0.1),
+    });
+
     frame.end();
 }
 

@@ -211,6 +211,7 @@ impl From<AmbientLight> for RenderOp {
 pub struct DrawImage {
     pub texture: Arc<Texture>,
     pub pos: Vec2,
+    /// In scale
     pub size: Vec2,
     pub rotation: f32,
 
@@ -226,7 +227,11 @@ impl From<DrawImage> for RenderOp {
 #[derive(Debug)]
 pub struct DrawBillboard {
     pub texture: Arc<Texture>,
+
+    /// Of the center
     pub pos: Vec3,
+
+    /// In scale
     pub size: Vec2,
     pub rotation: f32,
     pub blend_mode: (),
@@ -251,8 +256,12 @@ impl From<VisualizeProbes> for RenderOp {
 #[derive(Debug)]
 pub struct ShowInternalTexture {
     pub name: String,
+
+    /// Of the left-bottom
     pub pos: Vec2,
-    pub size: Vec2
+
+    /// In scale
+    pub size: Vec2,
 }
 impl From<ShowInternalTexture> for RenderOp {
     fn from(x: ShowInternalTexture) -> Self {
