@@ -174,6 +174,22 @@ impl RenderContext {
                     .push(x);
                 Ok(None)
             }
+            RenderOp::ShadeWithIv(x) => {
+                let chamber_index = x.chamber_index;
+                if self
+                    .get_mut_chamber_ctx(x.chamber_index)?
+                    .shade_with_iv
+                    .replace(x)
+                    .is_some()
+                {
+                    Err(OpError::InvalidShade(format!(
+                        "ShadeWithIv on chamber #{}",
+                        chamber_index
+                    )))
+                } else {
+                    Ok(None)
+                }
+            }
             RenderOp::VisualizeProbes(c) => {
                 let chamber = self.get_chamber_ctx(c.chamber_index)?;
                 let probes = chamber

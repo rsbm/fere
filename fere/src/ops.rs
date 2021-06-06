@@ -207,6 +207,21 @@ impl From<AmbientLight> for RenderOp {
     }
 }
 
+/// Shades a chamber with irradiance volume. Use only once for a chamber.
+#[derive(Debug)]
+pub struct ShadeWithIv {
+    /// The index of the chamber to apply irradiance volume.
+    pub chamber_index: ChamberIndex,
+
+    /// A weight to control the intensity of illumination. Use [0, 1].
+    pub weight: f32,
+}
+impl From<ShadeWithIv> for RenderOp {
+    fn from(x: ShadeWithIv) -> Self {
+        Self::ShadeWithIv(x)
+    }
+}
+
 #[derive(Debug)]
 pub struct DrawImage {
     pub texture: Arc<Texture>,
@@ -291,6 +306,9 @@ pub enum RenderOp {
     AddMajorLight(MajorLight),
     AddPointLight(PointLight),
     AddAmbientLight(AmbientLight),
+
+    // Perform global illumination
+    ShadeWithIv(ShadeWithIv),
 
     // 2D Renderings
     DrawImage(DrawImage),

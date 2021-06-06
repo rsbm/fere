@@ -103,6 +103,41 @@ impl RenderContext {
         }
 
         // Irradiance volumes
-        if self.params.enable_irradiance_volume {}
+        if let (Some(_), true) = (
+            chamber.shade_with_iv.as_ref(),
+            self.params.enable_irradiance_volume,
+        ) {
+            let prg = self.graphics.prgs.dr_2_irradiance.bind();
+            self.graphics.bind_gbuffer(prg, 0);
+            self.graphics.bind_probe_volume(
+                prg,
+                8,
+                chamber
+                    .chamber
+                    .state
+                    .probe_volume_suite
+                    .get_illumination_texture(),
+                chamber.chamber.state.probe_volume_suite.get_depth_texture(),
+            );
+
+            let pv = &chamber.chamber.state.probe_volume_suite.probe_volume();
+            let nums_float: Vec3 = nalgebra::convert(pv.number());
+            let volume_room = crate::graphics::glmanager::light::ProbeVolumeRoom {
+                trans: Mat4::identity(),
+                offset: pv.offset(),
+                cell_size: pv.cell_size(),
+                nums: pv.number(),
+                room_size: chamber.chamber.config.size,
+                padded_room_size: pv.cell_size().component_mul(&nums_float),
+                params: pv.params(),
+            };
+            prg.uniform_probe_volume(&volume_room);
+            self.graphics.draw_lightvolume_ambient(
+                prg,
+                &(chamber.chamber.config.bpos - Vec3::new(0.5, 0.5, 0.5)),
+                &camera.pos,
+                &(chamber.chamber.config.size + Vec3::new(1.0, 1.0, 1.0)),
+            );
+        }
     }
 }

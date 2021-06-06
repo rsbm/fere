@@ -6,8 +6,8 @@ use fere_common::*;
 pub struct ProbeVolumeSuite {
     probe_volume: ProbeVolume,
 
-    _texture_illumination: TextureInternal3D,
-    _texture_depth: TextureInternal3D,
+    texture_illumination: TextureInternal3D,
+    texture_depth: TextureInternal3D,
 
     buffer_diffuse: [Vec<Vec3>; 6],
     buffer_illumination: [Vec<Vec3>; 6],
@@ -36,8 +36,8 @@ impl ProbeVolumeSuite {
 
         Self {
             probe_volume,
-            _texture_illumination: texture_illumination,
-            _texture_depth: texture_depth,
+            texture_illumination,
+            texture_depth,
             buffer_diffuse,
             buffer_illumination,
             buffer_depth,
@@ -56,6 +56,14 @@ impl ProbeVolumeSuite {
     pub unsafe fn write_buffer(&mut self, graphics: &Graphics, dir: u8) {
         graphics.probe_read_illumination(self.buffer_illumination[dir as usize].as_mut_ptr());
         graphics.probe_read_depth(self.buffer_depth[dir as usize].as_mut_ptr());
+    }
+
+    pub fn get_illumination_texture(&self) -> &TextureInternal3D {
+        &self.texture_illumination
+    }
+
+    pub fn get_depth_texture(&self) -> &TextureInternal3D {
+        &self.texture_depth
     }
 
     pub fn update_probe(&mut self, probe_index: IVec3) {

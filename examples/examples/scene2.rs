@@ -36,10 +36,15 @@ impl SceneState {
             spheres.push((
                 pos,
                 fere_examples::gen_color(),
-                rng.gen_range(0..255),
+                rng.gen_range(20..80),
                 rng.gen_range(min_radius..max_radius),
             ));
         }
+        /*
+        spheres = vec![
+            (Vec3::new(0.0, 0.0, params.room_size.z/2.0), IVec3::new(255, 0, 0), 50, 10.0)
+        ];
+        */
         Self { spheres }
     }
 }
@@ -249,7 +254,10 @@ fn render(
     });
 
     frame.push(VisualizeProbes { chamber_index: 0 });
-
+    frame.push(ShadeWithIv {
+        chamber_index: 0,
+        weight: 0.0,
+    });
     frame.push(ShowInternalTexture {
         name: "iv_illuminatiion".to_owned(),
         pos: Vec2::new(0.0, 0.0),

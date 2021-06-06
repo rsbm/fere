@@ -25,6 +25,8 @@ pub(crate) struct ChamberContext {
     pub emissive_static_objects: Vec<ChamberEmissiveStaticObject>,
 
     pub billboards: Vec<DrawBillboard>,
+
+    pub shade_with_iv: Option<ShadeWithIv>,
 }
 
 impl ChamberContext {
@@ -37,6 +39,7 @@ impl ChamberContext {
             shadow_objects: Default::default(),
             emissive_static_objects: Default::default(),
             billboards: Default::default(),
+            shade_with_iv: Default::default(),
         }
     }
 }

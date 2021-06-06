@@ -27,7 +27,7 @@ uniform SLightVolume u_lv;
 
 /*
 0(pos), 1(norm), 2(bc), 3(roughness), 4(metalness), 5(emission), 6(_), 7(lighting)
-8(sh_diffuse) 9(sh_illumination) 10(sh_depth)
+8(sh_illumination) 9(sh_depth)
 */
 
 uniform sampler2D u_tex0;
@@ -41,7 +41,6 @@ uniform isampler2D u_tex7;
 
 uniform sampler3D u_tex8;
 uniform sampler3D u_tex9;
-uniform sampler3D u_tex10;
 
 layout (location = 0) out vec4 io_color;
 
@@ -143,7 +142,7 @@ float spherical_harmonics_1(float sh_coeff[18], vec3 p, mat3 table)
 	return result;
 }
 
-void irradiance_volume(vec3 P, vec3 N, out vec3 diffuse, out vec3 illumination, out float depth)
+void irradiance_volume(vec3 P, vec3 N, out vec3 illumination, out float depth)
 {
     vec4 P_ = u_lv.trans * vec4(P, 1);
     P = vec3(P_) / P_.w;
@@ -156,48 +155,34 @@ void irradiance_volume(vec3 P, vec3 N, out vec3 diffuse, out vec3 illumination, 
 	ivec3 p = ivec3(P); // lowest x,y,z probe
 	vec3 w = P - vec3(p);
 
-	vec3 sh_diffuse[18]; //max 18
 	vec3 sh_illumination[18];
 	float sh_depth[18];
 
 	ivec3 param_step = ivec3(0, 0, u_lv.nums[2] + 2);
 	for(int i = 0; i < u_lv.params; i++)
 	{
-		vec3 diffuse[8];
-		diffuse[0] = texelFetch(u_tex8, p + ivec3(0, 0, 0) + param_step * i, 0).rgb;
-		diffuse[1] = texelFetch(u_tex8, p + ivec3(1, 0, 0) + param_step * i, 0).rgb;
-		diffuse[2] = texelFetch(u_tex8, p + ivec3(0, 1, 0) + param_step * i, 0).rgb;
-		diffuse[3] = texelFetch(u_tex8, p + ivec3(1, 1, 0) + param_step * i, 0).rgb;
-		diffuse[4] = texelFetch(u_tex8, p + ivec3(0, 0, 1) + param_step * i, 0).rgb;
-		diffuse[5] = texelFetch(u_tex8, p + ivec3(1, 0, 1) + param_step * i, 0).rgb;
-		diffuse[6] = texelFetch(u_tex8, p + ivec3(0, 1, 1) + param_step * i, 0).rgb;
-		diffuse[7] = texelFetch(u_tex8, p + ivec3(1, 1, 1) + param_step * i, 0).rgb;
-		sh_diffuse[i] = trilinear(w[0], w[1], w[2], 
-		diffuse[0], diffuse[1], diffuse[2], diffuse[3],
-		diffuse[4], diffuse[5], diffuse[6], diffuse[7]);
-
 		vec3 illu[8];
-		illu[0] = texelFetch(u_tex9, p + ivec3(0, 0, 0) + param_step * i, 0).rgb;
-		illu[1] = texelFetch(u_tex9, p + ivec3(1, 0, 0) + param_step * i, 0).rgb;
-		illu[2] = texelFetch(u_tex9, p + ivec3(0, 1, 0) + param_step * i, 0).rgb;
-		illu[3] = texelFetch(u_tex9, p + ivec3(1, 1, 0) + param_step * i, 0).rgb;
-		illu[4] = texelFetch(u_tex9, p + ivec3(0, 0, 1) + param_step * i, 0).rgb;
-		illu[5] = texelFetch(u_tex9, p + ivec3(1, 0, 1) + param_step * i, 0).rgb;
-		illu[6] = texelFetch(u_tex9, p + ivec3(0, 1, 1) + param_step * i, 0).rgb;
-		illu[7] = texelFetch(u_tex9, p + ivec3(1, 1, 1) + param_step * i, 0).rgb;
+		illu[0] = texelFetch(u_tex8, p + ivec3(0, 0, 0) + param_step * i, 0).rgb;
+		illu[1] = texelFetch(u_tex8, p + ivec3(1, 0, 0) + param_step * i, 0).rgb;
+		illu[2] = texelFetch(u_tex8, p + ivec3(0, 1, 0) + param_step * i, 0).rgb;
+		illu[3] = texelFetch(u_tex8, p + ivec3(1, 1, 0) + param_step * i, 0).rgb;
+		illu[4] = texelFetch(u_tex8, p + ivec3(0, 0, 1) + param_step * i, 0).rgb;
+		illu[5] = texelFetch(u_tex8, p + ivec3(1, 0, 1) + param_step * i, 0).rgb;
+		illu[6] = texelFetch(u_tex8, p + ivec3(0, 1, 1) + param_step * i, 0).rgb;
+		illu[7] = texelFetch(u_tex8, p + ivec3(1, 1, 1) + param_step * i, 0).rgb;
 		sh_illumination[i] = trilinear(w[0], w[1], w[2], 
 		illu[0], illu[1], illu[2], illu[3],
 		illu[4], illu[5], illu[6], illu[7]);
 
 		float depth[8];
-		depth[0] = texelFetch(u_tex10, p + ivec3(0, 0, 0) + param_step * i, 0).r;
-		depth[1] = texelFetch(u_tex10, p + ivec3(1, 0, 0) + param_step * i, 0).r;
-		depth[2] = texelFetch(u_tex10, p + ivec3(0, 1, 0) + param_step * i, 0).r;
-		depth[3] = texelFetch(u_tex10, p + ivec3(1, 1, 0) + param_step * i, 0).r;
-		depth[4] = texelFetch(u_tex10, p + ivec3(0, 0, 1) + param_step * i, 0).r;
-		depth[5] = texelFetch(u_tex10, p + ivec3(1, 0, 1) + param_step * i, 0).r;
-		depth[6] = texelFetch(u_tex10, p + ivec3(0, 1, 1) + param_step * i, 0).r;
-		depth[7] = texelFetch(u_tex10, p + ivec3(1, 1, 1) + param_step * i, 0).r;
+		depth[0] = texelFetch(u_tex9, p + ivec3(0, 0, 0) + param_step * i, 0).r;
+		depth[1] = texelFetch(u_tex9, p + ivec3(1, 0, 0) + param_step * i, 0).r;
+		depth[2] = texelFetch(u_tex9, p + ivec3(0, 1, 0) + param_step * i, 0).r;
+		depth[3] = texelFetch(u_tex9, p + ivec3(1, 1, 0) + param_step * i, 0).r;
+		depth[4] = texelFetch(u_tex9, p + ivec3(0, 0, 1) + param_step * i, 0).r;
+		depth[5] = texelFetch(u_tex9, p + ivec3(1, 0, 1) + param_step * i, 0).r;
+		depth[6] = texelFetch(u_tex9, p + ivec3(0, 1, 1) + param_step * i, 0).r;
+		depth[7] = texelFetch(u_tex9, p + ivec3(1, 1, 1) + param_step * i, 0).r;
 		sh_depth[i] = trilinear_1(w[0], w[1], w[2], 
 		depth[0], depth[1], depth[2], depth[3],
 		depth[4], depth[5], depth[6], depth[7]);
@@ -208,7 +193,6 @@ void irradiance_volume(vec3 P, vec3 N, out vec3 diffuse, out vec3 illumination, 
         for(int j = 0; j < 3; j++)
             table[i][j] = N[i] * N[j];
 
-	diffuse = spherical_harmonics(sh_diffuse, N, table);
 	illumination = spherical_harmonics(sh_illumination, N, table);
 	depth = spherical_harmonics_1(sh_depth, N, table);
 }
@@ -229,14 +213,11 @@ void main()
 
 	if(lighting == 1)
 	{
-		vec3 diffuse;
 		vec3 illumination;
 		float depth;
 
-		irradiance_volume(wpos, wnormal, diffuse, illumination, depth);
-		//io_color = vec4(x * bc + vec3(0.01), 1.0);
-		io_color = vec4(diffuse, 1.0);
-        //io_color = vec4(depth, depth, depth, 1.0);
+		irradiance_volume(wpos, wnormal, illumination, depth);
+		io_color = vec4(illumination, 1.0);
 	}
 	else if (lighting == 4) {
 		io_color = vec4(bc, 1.0);

@@ -135,11 +135,10 @@ pub fn bind_probe_volume(
     _graphics: &super::Graphics,
     program: &Shader,
     offset: usize,
-    diffuse: &TextureInternal3D,
     illumination: &TextureInternal3D,
     depth: &TextureInternal3D,
 ) {
-    let targets = [diffuse, illumination, depth];
+    let targets = [illumination, depth];
     for (i, tex) in targets.iter().enumerate() {
         unsafe {
             gl::ActiveTexture(gl::TEXTURE0 + i as GLenum + offset as GLenum);

@@ -295,11 +295,10 @@ impl Graphics {
         &self,
         program: &Shader,
         offset: usize,
-        diffuse: &TextureInternal3D,
         illumination: &TextureInternal3D,
         depth: &TextureInternal3D,
     ) {
-        pass::bind_probe_volume(self, program, offset, diffuse, illumination, depth)
+        pass::bind_probe_volume(self, program, offset, illumination, depth)
     }
 
     pub fn render_final(&self) {

@@ -53,6 +53,8 @@ impl std::fmt::Display for FrameLog {
 pub enum OpError {
     #[error("Invalid chamber accesses: {0}")]
     InvalidChamberAccess(ChamberIndex),
+    #[error("Duplicated operations that must be unique: {0}")]
+    InvalidShade(String),
 }
 
 struct RenderContext {
