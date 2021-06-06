@@ -108,10 +108,17 @@ impl RenderContext {
                     self.get_mut_chamber_ctx(object.chamber_index)?
                         .shadow_objects
                         .push(ChamberShadowObject {
-                            mesh: object.mesh,
+                            mesh: Arc::clone(&object.mesh),
                             trans: object.trans,
                         })
                 }
+                self.get_mut_chamber_ctx(object.chamber_index)?
+                    .emissive_static_objects
+                    .push(ChamberEmissiveStaticObject {
+                        mesh: object.mesh,
+                        trans: object.trans,
+                        surface: surface,
+                    });
                 Ok(None)
             }
             RenderOp::DrawWireFrame(WireFrame {

@@ -317,8 +317,11 @@ impl Graphics {
 
 // Various debug-purpose backdoors
 impl Graphics {
-    pub fn get_irradiance_volume_tex(&self) -> u32 {
-        self.pass_probe.outputs_get()[1].tex_get().raw_get()
+    pub fn get_irradiance_volume_tex(&self) -> (u32, IVec2) {
+        (
+            self.pass_probe.outputs_get()[1].tex_get().raw_get(),
+            self.pass_probe.outputs_get()[1].size_get(),
+        )
     }
 
     pub fn get_gbuffer_normal(&self) -> (u32, IVec2) {

@@ -23,6 +23,8 @@ impl RenderContext {
     }
 
     pub fn update_probe(&mut self, chamber_index: ChamberIndex) {
+        self.graphics.bind_probe();
+
         let chamber = self.chamber_contexts[chamber_index as usize]
             .as_ref()
             .unwrap();

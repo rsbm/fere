@@ -167,6 +167,7 @@ impl Renderer {
         loop {
             match self.object_queue.recv().unwrap() {
                 RenderOp::EndFrame(_) => {
+                    // FIXME: Update only one.
                     if self.params.enable_irradiance_volume {
                         for i in 0..self.fere_configs.max_chamber_num {
                             if ctx.chamber_contexts[i].is_some() {
