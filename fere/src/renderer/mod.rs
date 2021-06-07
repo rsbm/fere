@@ -62,7 +62,7 @@ struct RenderContext {
     params: RendererParams,
     _fere_configs: FereConfigs,
     logs: Vec<FrameLog>,
-    camera_info: Option<CameraInfo>,
+    camera_info: Option<SetCamera>,
     chamber_contexts: Vec<Option<ChamberContext>>,
 
     draw_images: Vec<DrawImage>,

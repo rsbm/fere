@@ -85,7 +85,7 @@ impl ProgramWithImgui for Scene {
         self.input_manager.update(imgui_ctx.as_ref());
         self.camera_control
             .update(&self.input_manager.get_input_image());
-        let mut camera = CameraInfo::new(
+        let mut camera = SetCamera::new(
             self.camera_control.get().0,
             self.camera_control.get().1,
             Vec3::new(0.0, 0.0, 1.0),
@@ -145,7 +145,7 @@ fn render(mut frame: Frame, timer: u64, params: &SceneParams, resources: &Resour
         metalness: TexVar::U(0),
         normal: no_normal_map(),
     };
-    frame.push(General {
+    frame.push(DrawGeneral {
         object: Object {
             mesh,
             shadow: false,
@@ -170,7 +170,7 @@ fn render(mut frame: Frame, timer: u64, params: &SceneParams, resources: &Resour
         metalness: TexVar::U(240),
         normal: no_normal_map(),
     };
-    frame.push(General {
+    frame.push(DrawGeneral {
         object: Object {
             mesh: Arc::clone(&mesh),
             shadow: true,
@@ -194,7 +194,7 @@ fn render(mut frame: Frame, timer: u64, params: &SceneParams, resources: &Resour
         metalness: TexVar::U(20),
         normal: no_normal_map(),
     };
-    frame.push(General {
+    frame.push(DrawGeneral {
         object: Object {
             mesh,
             shadow: false,
@@ -218,7 +218,7 @@ fn render(mut frame: Frame, timer: u64, params: &SceneParams, resources: &Resour
         metalness: TexVar::U(0),
         normal: no_normal_map(),
     };
-    frame.push(General {
+    frame.push(DrawGeneral {
         object: Object {
             mesh,
             shadow: true,
@@ -230,7 +230,7 @@ fn render(mut frame: Frame, timer: u64, params: &SceneParams, resources: &Resour
     });
 
     // Add lights
-    frame.push(AmbientLight {
+    frame.push(AddAmbientLight {
         color: Vec3::new(0.05, 0.05, 0.05),
         omni: true,
         chamber_index: 0,
@@ -247,7 +247,7 @@ fn render(mut frame: Frame, timer: u64, params: &SceneParams, resources: &Resour
     let xdir = normalize(&glm::cross(&look_dir, &Vec3::new(0.0, 0.0, 1.0)));
     let ydir = normalize(&glm::cross(&xdir, &look_dir));
 
-    frame.push(MajorLight {
+    frame.push(AddMajorLight {
         pos,
         color: Vec3::new(1000.0, 0.0, 0.0),
         xdir,

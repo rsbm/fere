@@ -38,35 +38,35 @@ pub struct Object {
 }
 
 #[derive(Debug)]
-pub struct General {
+pub struct DrawGeneral {
     /// The object
     pub object: Object,
 
     /// The surface to apply on the mesh.
     pub surface: surface::GeneralI,
 }
-impl From<General> for RenderOp {
-    fn from(x: General) -> Self {
+impl From<DrawGeneral> for RenderOp {
+    fn from(x: DrawGeneral) -> Self {
         Self::DrawGeneral(x)
     }
 }
 
 #[derive(Debug)]
-pub struct EmissiveStatic {
+pub struct DrawEmissiveStatic {
     /// The object
     pub object: Object,
 
     /// The surface to apply on the mesh.
     pub surface: surface::EmissiveStaticI,
 }
-impl From<EmissiveStatic> for RenderOp {
-    fn from(x: EmissiveStatic) -> Self {
+impl From<DrawEmissiveStatic> for RenderOp {
+    fn from(x: DrawEmissiveStatic) -> Self {
         Self::DrawEmissiveStatic(x)
     }
 }
 
 #[derive(Debug)]
-pub struct EmissiveDynamic {
+pub struct DrawEmissiveDynamic {
     /// The object
     pub object: Object,
 
@@ -76,27 +76,27 @@ pub struct EmissiveDynamic {
     /// The surface to apply on the mesh.
     pub surface: surface::EmissiveDynamic,
 }
-impl From<EmissiveDynamic> for RenderOp {
-    fn from(x: EmissiveDynamic) -> Self {
+impl From<DrawEmissiveDynamic> for RenderOp {
+    fn from(x: DrawEmissiveDynamic) -> Self {
         Self::DrawEmissiveDynamic(x)
     }
 }
 
 #[derive(Debug)]
-pub struct Line {
+pub struct DrawLine {
     pub pos1: Vec3,
     pub pos2: Vec3,
     pub color: IVec4,
     pub width: f32,
 }
-impl From<Line> for RenderOp {
-    fn from(x: Line) -> Self {
+impl From<DrawLine> for RenderOp {
+    fn from(x: DrawLine) -> Self {
         Self::DrawLine(x)
     }
 }
 
 #[derive(Debug)]
-pub struct WireFrame {
+pub struct DrawWireFrame {
     /// The mesh to render.
     pub mesh: Arc<Mesh>,
 
@@ -106,15 +106,15 @@ pub struct WireFrame {
     pub color: IVec4,
     pub width: f32,
 }
-impl From<WireFrame> for RenderOp {
-    fn from(x: WireFrame) -> Self {
+impl From<DrawWireFrame> for RenderOp {
+    fn from(x: DrawWireFrame) -> Self {
         Self::DrawWireFrame(x)
     }
 }
 
 #[derive(Debug)]
 /// A point light that involves shadows and some additional effects.
-pub struct MajorLight {
+pub struct AddMajorLight {
     /// The position of the light.
     pub pos: Vec3,
 
@@ -133,8 +133,8 @@ pub struct MajorLight {
     /// The index of the chamber this light belongs to
     pub chamber_index: ChamberIndex,
 }
-impl From<MajorLight> for RenderOp {
-    fn from(x: MajorLight) -> Self {
+impl From<AddMajorLight> for RenderOp {
+    fn from(x: AddMajorLight) -> Self {
         Self::AddMajorLight(x)
     }
 }
@@ -157,7 +157,7 @@ impl From<MajorLightOmni> for RenderOp {
             (0..6)
                 .map(|i| {
                     let (xdir, ydir) = fere_common::geo::six_sides_dir(i);
-                    MajorLight {
+                    AddMajorLight {
                         pos: x.pos,
                         color: x.color,
                         xdir,
@@ -174,7 +174,7 @@ impl From<MajorLightOmni> for RenderOp {
 
 #[derive(Debug)]
 /// A plain poing light
-pub struct PointLight {
+pub struct AddPointLight {
     /// The position of the light.
     pub pos: Vec3,
 
@@ -184,14 +184,14 @@ pub struct PointLight {
     /// The index of the chamber this light belongs to
     pub chamber_index: ChamberIndex,
 }
-impl From<PointLight> for RenderOp {
-    fn from(x: PointLight) -> Self {
+impl From<AddPointLight> for RenderOp {
+    fn from(x: AddPointLight) -> Self {
         Self::AddPointLight(x)
     }
 }
 
 #[derive(Debug)]
-pub struct AmbientLight {
+pub struct AddAmbientLight {
     /// The color of the light.
     pub color: Vec3,
 
@@ -201,8 +201,8 @@ pub struct AmbientLight {
     /// The index of the chamber this light belongs to
     pub chamber_index: ChamberIndex,
 }
-impl From<AmbientLight> for RenderOp {
-    fn from(x: AmbientLight) -> Self {
+impl From<AddAmbientLight> for RenderOp {
+    fn from(x: AddAmbientLight) -> Self {
         Self::AddAmbientLight(x)
     }
 }
@@ -293,19 +293,19 @@ pub enum RenderOp {
     EndFrame(InternalOp),
 
     // Special operations to configure the chamber
-    SetCamera(CameraInfo),
+    SetCamera(SetCamera),
 
     // Draw various objects
-    DrawLine(Line),
-    DrawWireFrame(WireFrame),
-    DrawGeneral(General),
-    DrawEmissiveStatic(EmissiveStatic),
-    DrawEmissiveDynamic(EmissiveDynamic),
+    DrawLine(DrawLine),
+    DrawWireFrame(DrawWireFrame),
+    DrawGeneral(DrawGeneral),
+    DrawEmissiveStatic(DrawEmissiveStatic),
+    DrawEmissiveDynamic(DrawEmissiveDynamic),
 
     // Add various lights
-    AddMajorLight(MajorLight),
-    AddPointLight(PointLight),
-    AddAmbientLight(AmbientLight),
+    AddMajorLight(AddMajorLight),
+    AddPointLight(AddPointLight),
+    AddAmbientLight(AddAmbientLight),
 
     // Perform global illumination
     ShadeWithIv(ShadeWithIv),
@@ -321,8 +321,8 @@ pub enum RenderOp {
     // Meta operations
     Multiple(Vec<RenderOp>),
 }
-impl From<CameraInfo> for RenderOp {
-    fn from(x: CameraInfo) -> Self {
+impl From<SetCamera> for RenderOp {
+    fn from(x: SetCamera) -> Self {
         Self::SetCamera(x)
     }
 }

@@ -115,7 +115,7 @@ impl Program for Scene {
     fn update(&mut self) -> String {
         let cpos = Vec3::new(0.0, 0.0, 300.0);
         let screen_size = self.renderer.configs().resolution;
-        let mut camera = CameraInfo::new(
+        let mut camera = SetCamera::new(
             cpos,
             Vec3::new(0.0, 0.0, 0.0),
             Vec3::new(0.0, 1.0, 0.0),

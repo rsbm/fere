@@ -24,7 +24,7 @@ impl Program for Scene {
     fn update(&mut self) -> String {
         let cpos = Vec3::new(8.0, -10.0, 10.0);
         let screen_size = self.renderer.configs().resolution;
-        let mut camera = CameraInfo::new(
+        let mut camera = SetCamera::new(
             cpos,
             Vec3::new(0.0, 0.0, 0.0),
             Vec3::new(0.0, 0.0, 1.0),
@@ -60,7 +60,7 @@ fn render(mut frame: Frame) {
         color, xcolor, ycolor, count, interval, width, z_offset,
     ));
 
-    frame.push(rops::AmbientLight {
+    frame.push(rops::AddAmbientLight {
         color: Vec3::new(0.0, 0.0, 0.0),
         omni: false,
         chamber_index: 0,

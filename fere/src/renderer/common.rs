@@ -1,8 +1,8 @@
 use super::*;
 
-pub fn prepare_major_light(major_light: &MajorLight) -> (LightDir, CameraInfo) {
+pub fn prepare_major_light(major_light: &AddMajorLight) -> (LightDir, SetCamera) {
     let dir = -normalize(&glm::cross(&major_light.xdir, &major_light.ydir));
-    let mut camera = CameraInfo::new(
+    let mut camera = SetCamera::new(
         major_light.pos,
         major_light.pos + dir,
         major_light.ydir,

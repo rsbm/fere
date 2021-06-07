@@ -36,7 +36,7 @@ impl RenderContext {
         self.graphics.bind_deferred_pass2(true);
 
         // - Omni-lights
-        let omni_lights: Vec<&AmbientLight> = chamber
+        let omni_lights: Vec<&AddAmbientLight> = chamber
             .ambient_lights
             .iter()
             .filter(|light| light.omni)
@@ -54,7 +54,7 @@ impl RenderContext {
         }
 
         // - Raw ambient lights
-        let omni_lights: Vec<&AmbientLight> = chamber
+        let omni_lights: Vec<&AddAmbientLight> = chamber
             .ambient_lights
             .iter()
             .filter(|light| !light.omni)

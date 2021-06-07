@@ -3,7 +3,7 @@
 mod calculation;
 mod suite;
 
-use crate::CameraInfo;
+use crate::SetCamera;
 use fere_common::*;
 use fere_common::{
     geo::{six_sides_dir, SixDir},
@@ -59,11 +59,11 @@ impl ProbeVolume {
         self.min_gap
     }
 
-    pub fn camera(&self, index: IVec3, side: SixDir) -> CameraInfo {
+    pub fn camera(&self, index: IVec3, side: SixDir) -> SetCamera {
         let dir = six_sides_dir(side);
         let forward_dir = -glm::cross(&dir.0, &dir.1);
         let pos = self.probes[GridAccessor3(self.number).get(&index)].pos;
-        CameraInfo::new(
+        SetCamera::new(
             pos,
             pos + forward_dir,
             dir.1,

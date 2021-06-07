@@ -17,9 +17,9 @@ pub(crate) struct ChamberEmissiveStaticObject {
 pub(crate) struct ChamberContext {
     pub chamber: Chamber,
 
-    pub major_lights: Vec<MajorLight>,
-    pub ambient_lights: Vec<AmbientLight>,
-    pub point_lights: Vec<PointLight>,
+    pub major_lights: Vec<AddMajorLight>,
+    pub ambient_lights: Vec<AddAmbientLight>,
+    pub point_lights: Vec<AddPointLight>,
 
     pub shadow_objects: Vec<ChamberShadowObject>,
     pub emissive_static_objects: Vec<ChamberEmissiveStaticObject>,

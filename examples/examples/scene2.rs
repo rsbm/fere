@@ -105,7 +105,7 @@ impl ProgramWithImgui for Scene {
         self.input_manager.update(imgui_ctx.as_ref());
         self.camera_control
             .update(&self.input_manager.get_input_image());
-        let mut camera = CameraInfo::new(
+        let mut camera = SetCamera::new(
             self.camera_control.get().0,
             self.camera_control.get().1,
             Vec3::new(0.0, 0.0, 1.0),
@@ -178,7 +178,7 @@ fn render(
         metalness: TexVar::U(0),
         normal: no_normal_map(),
     };
-    frame.push(General {
+    frame.push(DrawGeneral {
         object: Object {
             mesh,
             shadow: false,
@@ -202,7 +202,7 @@ fn render(
         metalness: TexVar::U(200),
         normal: no_normal_map(),
     };
-    frame.push(General {
+    frame.push(DrawGeneral {
         object: Object {
             mesh,
             shadow: true,
@@ -235,7 +235,7 @@ fn render(
                 smoothness: 1.0,
             },
         );
-        frame.push(EmissiveStatic {
+        frame.push(DrawEmissiveStatic {
             object: Object {
                 mesh: Arc::clone(&mesh),
                 shadow: true,
@@ -247,7 +247,7 @@ fn render(
         });
     }
 
-    frame.push(AmbientLight {
+    frame.push(AddAmbientLight {
         color: Vec3::new(0.05, 0.05, 0.05),
         omni: true,
         chamber_index: 0,

@@ -1,7 +1,7 @@
 use super::*;
 
 #[derive(Clone, Debug)]
-pub struct CameraInfo {
+pub struct SetCamera {
     pub pos: Vec3,
     pub look: Vec3,
     pub up: Vec3,
@@ -15,7 +15,7 @@ pub struct CameraInfo {
     view: Option<Mat4>,
 }
 
-impl CameraInfo {
+impl SetCamera {
     pub fn new(
         pos: Vec3,
         look: Vec3,
@@ -25,7 +25,7 @@ impl CameraInfo {
         near: f32,
         far: f32,
     ) -> Self {
-        CameraInfo {
+        SetCamera {
             pos,
             look,
             up,

@@ -33,7 +33,7 @@ impl RenderContext {
                 self.camera_info = Some(camera_info_);
                 Ok(None)
             }
-            RenderOp::DrawLine(Line {
+            RenderOp::DrawLine(DrawLine {
                 pos1,
                 pos2,
                 color,
@@ -56,7 +56,7 @@ impl RenderContext {
                 arr.draw_line();
                 Ok(None)
             }
-            RenderOp::DrawGeneral(General { object, surface }) => {
+            RenderOp::DrawGeneral(DrawGeneral { object, surface }) => {
                 self.get_chamber_ctx(object.chamber_index)?;
 
                 let prg = self.graphics.prgs.standard.as_ref();
@@ -85,7 +85,7 @@ impl RenderContext {
                 }
                 Ok(None)
             }
-            RenderOp::DrawEmissiveStatic(EmissiveStatic { object, surface }) => {
+            RenderOp::DrawEmissiveStatic(DrawEmissiveStatic { object, surface }) => {
                 self.get_chamber_ctx(object.chamber_index)?;
 
                 let prg = self.graphics.prgs.standard.as_ref();
@@ -121,7 +121,7 @@ impl RenderContext {
                     });
                 Ok(None)
             }
-            RenderOp::DrawWireFrame(WireFrame {
+            RenderOp::DrawWireFrame(DrawWireFrame {
                 mesh,
                 trans,
                 color,
@@ -148,7 +148,7 @@ impl RenderContext {
                 let result =
                     if self.params.debug_lightvolume_outline {
                         let (light, _) = common::prepare_major_light(&x);
-                        Some(RenderOp::DrawWireFrame(WireFrame {
+                        Some(RenderOp::DrawWireFrame(DrawWireFrame {
 						mesh: Arc::clone(&self.graphics.meshes().pyramid),
 						trans: crate::graphics::graphics::Graphics::get_transform_for_lightvolume_dir(&light),
 						color: IVec4::new(0, 255, 255 ,255),
