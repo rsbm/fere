@@ -194,6 +194,7 @@ void irradiance_volume(vec3 P, vec3 N, out vec3 illumination, out float depth)
             table[i][j] = N[i] * N[j];
 
 	illumination = spherical_harmonics(sh_illumination, N, table);
+	illumination *= 0.1;
 	depth = spherical_harmonics_1(sh_depth, N, table);
 }
 
@@ -217,6 +218,7 @@ void main()
 		float depth;
 
 		irradiance_volume(wpos, wnormal, illumination, depth);
+		illumination *= 10.0;
 		io_color = vec4(illumination, 1.0);
 	}
 	else if (lighting == 4) {

@@ -6,8 +6,9 @@ use fere_common::*;
 pub struct ProbeVolumeSuite {
     probe_volume: ProbeVolume,
 
-    texture_illumination: TextureInternal3D,
-    texture_depth: TextureInternal3D,
+    /// The actual texture to use in shader for shading
+    sh_texture_illumination: TextureInternal3D,
+    sh_texture_depth: TextureInternal3D,
 
     buffer_diffuse: [Vec<Vec3>; 6],
     buffer_illumination: [Vec<Vec3>; 6],
@@ -25,9 +26,9 @@ impl ProbeVolumeSuite {
     pub fn new(room_size: Vec3, scale: f32, resolution: usize) -> Self {
         let probe_volume = ProbeVolume::new(room_size, scale, resolution);
 
-        let texture_illumination =
+        let sh_texture_illumination =
             TextureInternal3D::new(InternalTexType::Float3, probe_volume.texture_size());
-        let texture_depth =
+        let sh_texture_depth =
             TextureInternal3D::new(InternalTexType::Float1, probe_volume.texture_size());
 
         let buffer_diffuse = init_buffer(Vec3::new(0.0, 0.0, 0.0), resolution);
@@ -36,8 +37,8 @@ impl ProbeVolumeSuite {
 
         Self {
             probe_volume,
-            texture_illumination,
-            texture_depth,
+            sh_texture_illumination,
+            sh_texture_depth,
             buffer_diffuse,
             buffer_illumination,
             buffer_depth,
@@ -49,7 +50,7 @@ impl ProbeVolumeSuite {
         &self.probe_volume
     }
 
-    /// Does some shit
+    /// Reads output buffer in RAM for calculation
     ///
     /// # Safety
     /// TODO
@@ -59,13 +60,14 @@ impl ProbeVolumeSuite {
     }
 
     pub fn get_illumination_texture(&self) -> &TextureInternal3D {
-        &self.texture_illumination
+        &self.sh_texture_illumination
     }
 
     pub fn get_depth_texture(&self) -> &TextureInternal3D {
-        &self.texture_depth
+        &self.sh_texture_depth
     }
 
+    /// After calling `write_buffer()` for 6 times, calculate the sh and update the 3d texture.
     pub fn update_probe(&mut self, probe_index: IVec3) {
         self.probe_volume.update_probe(
             probe_index,
@@ -75,5 +77,11 @@ impl ProbeVolumeSuite {
             &self.buffer_depth,
         );
         self.probe_volume.update_texture();
+        unsafe {
+            self.sh_texture_illumination
+                .load(self.probe_volume.texture_illumination().as_ptr().cast());
+            self.sh_texture_depth
+                .load(self.probe_volume.texture_depth().as_ptr().cast());
+        }
     }
 }
