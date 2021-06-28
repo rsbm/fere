@@ -76,6 +76,7 @@ pub enum UniformPv {
     RoomSize,
     PaddedRoomSize,
     Params,
+    Weight,
     Max_,
 }
 
@@ -312,6 +313,8 @@ impl Shader {
             gl::Uniform3fv(u, 1, pv.padded_room_size.as_ptr());
             let u = self.uloc_pv[UniformPv::Params as usize];
             gl::Uniform1i(u, pv.params as i32);
+            let u = self.uloc_pv[UniformPv::Weight as usize];
+            gl::Uniform1f(u, pv.weight);
         }
     }
 

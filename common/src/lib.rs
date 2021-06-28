@@ -2,6 +2,7 @@ mod camera;
 mod ori;
 
 pub mod geo;
+pub mod light;
 pub mod vec;
 
 pub use camera::SetCamera;

@@ -22,6 +22,8 @@ struct SLightVolume
     vec3 room_size;
 
 	int params; // sh dimension
+
+	float weight;
 };
 uniform SLightVolume u_lv;
 
@@ -218,7 +220,7 @@ void main()
 		float depth;
 
 		irradiance_volume(wpos, wnormal, illumination, depth);
-		illumination *= 10.0;
+		illumination *= 10.0 * u_lv.weight;
 		io_color = vec4(illumination, 1.0);
 	}
 	else if (lighting == 4) {

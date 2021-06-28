@@ -43,4 +43,7 @@ pub struct ProbeVolumeRoom {
 
     /// sh order
     pub params: usize,
+
+    /// [0, 1]
+    pub weight: f32,
 }

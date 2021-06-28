@@ -58,6 +58,11 @@ pub struct DrawEmissiveStatic {
 
     /// The surface to apply on the mesh.
     pub surface: surface::EmissiveStaticI,
+
+    /// Whether to put additional point light to approximate the emission. Use (0, 1].
+    ///
+    /// It uses the average position and color for the given object and surface.
+    pub point_light: Option<f32>,
 }
 impl From<DrawEmissiveStatic> for RenderOp {
     fn from(x: DrawEmissiveStatic) -> Self {

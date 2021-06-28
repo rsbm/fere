@@ -55,6 +55,8 @@ pub enum OpError {
     InvalidChamberAccess(ChamberIndex),
     #[error("Duplicated operations that must be unique: {0}")]
     InvalidShade(String),
+    #[error("{0}")]
+    Other(String),
 }
 
 struct RenderContext {

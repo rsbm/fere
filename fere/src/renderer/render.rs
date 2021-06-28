@@ -85,7 +85,11 @@ impl RenderContext {
                 }
                 Ok(None)
             }
-            RenderOp::DrawEmissiveStatic(DrawEmissiveStatic { object, surface }) => {
+            RenderOp::DrawEmissiveStatic(DrawEmissiveStatic {
+                object,
+                surface,
+                point_light,
+            }) => {
                 self.get_chamber_ctx(object.chamber_index)?;
 
                 let prg = self.graphics.prgs.standard.as_ref();
@@ -115,11 +119,31 @@ impl RenderContext {
                 self.get_mut_chamber_ctx(object.chamber_index)?
                     .emissive_static_objects
                     .push(ChamberEmissiveStaticObject {
-                        mesh: object.mesh,
+                        mesh: Arc::clone(&object.mesh),
                         trans: object.trans,
-                        surface: surface,
+                        surface: surface.clone(),
                     });
-                Ok(None)
+
+                if let Some(point_light) = point_light {
+                    let emission = match surface.timepoints[0].emission {
+                            fere_resources::surface::TexVar::T(_) => return Err(OpError::Other("`point_light` in `DrawEmissiveStatic` is not implemented for a textured surface.".to_owned())),
+                            fere_resources::surface::TexVar::U(x) => x,
+                        };
+                    let emission_intensity = match &surface.timepoints[0].emission_intensity {
+                            fere_resources::surface::TexVar::T(_) => return Err(OpError::Other("`point_light` in `DrawEmissiveStatic` is not implemented for a textured surface.".to_owned())),
+                            fere_resources::surface::TexVar::U(x) => x,
+                        };
+
+                    Ok(Some(RenderOp::AddPointLight(AddPointLight {
+                        pos: object.mesh.description().mean_pos,
+                        color: nalgebra::convert::<IVec3, Vec3>(emission) / 255.0
+                            * fere_common::light::intensity_to_weight(*emission_intensity)
+                            * point_light,
+                        chamber_index: object.chamber_index,
+                    })))
+                } else {
+                    Ok(None)
+                }
             }
             RenderOp::DrawWireFrame(DrawWireFrame {
                 mesh,

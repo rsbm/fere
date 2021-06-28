@@ -103,7 +103,7 @@ impl RenderContext {
         }
 
         // Irradiance volumes
-        if let (Some(_), true) = (
+        if let (Some(ShadeWithIv { weight, .. }), true) = (
             chamber.shade_with_iv.as_ref(),
             self.params.enable_irradiance_volume,
         ) {
@@ -130,6 +130,7 @@ impl RenderContext {
                 room_size: chamber.chamber.config.size,
                 padded_room_size: pv.cell_size().component_mul(&nums_float),
                 params: pv.params(),
+                weight: *weight,
             };
             prg.uniform_probe_volume(&volume_room);
             self.graphics.draw_lightvolume_ambient(

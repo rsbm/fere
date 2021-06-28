@@ -244,6 +244,7 @@ fn render(
                 chamber_index: 0,
             },
             surface,
+            point_light: Some(1.0),
         });
     }
 

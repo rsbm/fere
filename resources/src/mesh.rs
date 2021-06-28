@@ -34,6 +34,16 @@ impl MeshData {
             acc
         })
     }
+
+    pub fn create_description(&self) -> MeshDescription {
+        let mean_pos = self.pos.iter().sum::<Vec3>() / self.pos.len() as f32;
+        MeshDescription { mean_pos }
+    }
+}
+
+#[derive(Debug)]
+pub struct MeshDescription {
+    pub mean_pos: Vec3,
 }
 
 #[derive(Debug)]
@@ -45,6 +55,7 @@ pub struct Mesh {
 
     // CPU things - will be purged from memory after buffer
     data: Option<MeshData>,
+    description: MeshDescription,
 
     // GPU things - will exist only after buffer
     vao: GLuint,
@@ -53,6 +64,7 @@ pub struct Mesh {
 
 impl Mesh {
     pub fn new(path: Option<String>, data: MeshData) -> Self {
+        let description = data.create_description();
         Mesh {
             name: data.name.clone(),
             path,
@@ -60,7 +72,12 @@ impl Mesh {
             data: Some(data),
             vao: 0,
             vbo: 0,
+            description,
         }
+    }
+
+    pub fn description(&self) -> &MeshDescription {
+        &self.description
     }
 
     pub fn buffer(&mut self) {
