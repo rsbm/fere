@@ -27,6 +27,8 @@ pub struct Programs {
     pub geo_visualize: Arc<Shader>,
 
     pub image: Arc<Shader>,
+
+    pub yuv: Arc<Shader>,
 }
 
 impl Programs {
@@ -57,6 +59,8 @@ impl Programs {
             geo_visualize: glmanager.get_program("geo_visualize"),
 
             image: glmanager.get_program("image"),
+
+            yuv: glmanager.get_program("yuv"),
         }
     }
 }

@@ -56,3 +56,6 @@ sh_visualize:
 debug_test:
 - debug/vdebug_basic.glsl
 - debug/ftest.glsl
+yuv:
+- deferred/vdr1.glsl
+- deferred/fyuv.glsl

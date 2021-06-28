@@ -3,6 +3,7 @@ mod frame;
 mod graphics;
 pub mod ops;
 mod renderer;
+mod video_record;
 
 use crate::graphics::gi::probe_volume::ProbeVolumeSuite;
 use crate::graphics::graphics::{Graphics, GraphicsConfig};
@@ -28,6 +29,8 @@ pub mod prelude {
 pub enum Error {
     #[error("Invalid chamber accesses")]
     InvalidChamberAccess,
+    #[error("Recording error: {0}")]
+    RecordingError(String),
 }
 
 #[derive(Clone, Debug)]
@@ -71,6 +74,8 @@ pub struct Fere {
     graphics: Option<Graphics>,
     configs: FereConfigs,
     chambers: Vec<Option<Chamber>>,
+
+    recording_session: Option<video_record::VideoRecordingSession>,
 }
 
 impl Fere {
@@ -81,9 +86,11 @@ impl Fere {
                 shadow_resolution: configs.shadow_resolution,
                 probe_resolution: configs.probe_resolution,
                 max_major_lights: configs.max_major_lights,
+                video_record: configs.video_record,
             })),
             chambers: (0..configs.max_chamber_num).map(|_| None).collect(),
             configs,
+            recording_session: None,
         }
     }
 
@@ -171,6 +178,32 @@ impl Fere {
             self.graphics.replace(render_end.graphics).is_none(),
             "end_frame() called without new_frame()"
         );
+    }
+
+    pub fn start_recording(&mut self, port: u16) -> Result<(), Error> {
+        if self.recording_session.is_some() {
+            Err(Error::RecordingError(
+                "start_recording() while there's already a session".to_owned(),
+            ))
+        } else {
+            self.recording_session = Some(video_record::VideoRecordingSession::new(
+                port,
+                self.graphics().screen_size(),
+                60,
+            ));
+            Ok(())
+        }
+    }
+
+    pub fn end_recording(&mut self) -> Result<(), Error> {
+        if let Some(recording_session) = self.recording_session.take() {
+            recording_session.end();
+            Ok(())
+        } else {
+            Err(Error::RecordingError(
+                "end_recording() called without recording session".to_owned(),
+            ))
+        }
     }
 }
 

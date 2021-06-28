@@ -10,6 +10,8 @@ pub struct FereConfigs {
     pub probe_resolution: usize,
     pub max_major_lights: usize,
 
+    pub video_record: bool,
+
     pub irradiance_volume: Option<IrradianceVolumeConfigs>,
 
     pub max_chamber_num: usize,

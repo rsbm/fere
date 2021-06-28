@@ -50,6 +50,15 @@ pub fn create_probe(size: u32) -> FrameBuffer {
     FrameBuffer::new(outputs, Some(depth))
 }
 
+pub fn create_yuv(size: IVec2) -> FrameBuffer {
+    let outputs = vec![
+        TextureInternal2D::new(InternalTexType::Material, size),
+        TextureInternal2D::new(InternalTexType::Material, size),
+        TextureInternal2D::new(InternalTexType::Material, size),
+    ];
+    FrameBuffer::new(outputs, None)
+}
+
 pub fn bind_shadow(graphics: &super::Graphics, index: usize) {
     deferred_mode(false, true, false);
     graphics.pass_shadow[index].bind();
@@ -163,6 +172,33 @@ pub fn render_final(graphics: &super::Graphics) {
         gl::Clear(gl::COLOR_BUFFER_BIT | gl::DEPTH_BUFFER_BIT);
 
         let program = graphics.prgs.dr_3.bind();
+
+        gl::ActiveTexture(gl::TEXTURE0);
+        gl::BindTexture(
+            gl::TEXTURE_2D,
+            graphics.pass_final.outputs_get()[0].tex_get().raw_get(),
+        );
+        gl::Uniform1i(program.uloc_get_tex()[0], 0);
+
+        graphics.fill_screen(program);
+    }
+}
+
+pub fn render_yuv(graphics: &super::Graphics) {
+    deferred_mode(true, false, false);
+
+    unsafe {
+        gl::Disable(gl::BLEND);
+        gl::Disable(gl::DEPTH_TEST);
+        gl::Disable(gl::MULTISAMPLE);
+        gl::Disable(gl::CULL_FACE);
+        gl::Disable(gl::STENCIL_TEST);
+
+        gl::BindFramebuffer(gl::FRAMEBUFFER, 0);
+        deferred_mode(true, true, false);
+        gl::Clear(gl::COLOR_BUFFER_BIT | gl::DEPTH_BUFFER_BIT);
+
+        let program = graphics.prgs.yuv.bind();
 
         gl::ActiveTexture(gl::TEXTURE0);
         gl::BindTexture(

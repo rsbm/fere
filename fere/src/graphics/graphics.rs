@@ -1,7 +1,7 @@
 pub mod material;
 mod pass;
 mod prgs;
-mod probe;
+mod read_buffer;
 pub mod texture_internal;
 
 use super::{
@@ -61,6 +61,8 @@ pub struct GraphicsConfig {
     pub shadow_resolution: usize,
     pub probe_resolution: usize,
     pub max_major_lights: usize,
+
+    pub video_record: bool,
 }
 
 pub struct Graphics {
@@ -73,6 +75,8 @@ pub struct Graphics {
     pass_final: FrameBuffer,
     pass_shadow: Vec<FrameBuffer>,
     pass_probe: FrameBuffer,
+
+    pass_yuv: Option<FrameBuffer>,
 
     // useful meshes
     meshes: Meshes,
@@ -93,6 +97,11 @@ impl Graphics {
             .map(|_| pass::create_shadow(config.shadow_resolution as u32))
             .collect::<Vec<_>>();
         let pass_probe = pass::create_probe(config.probe_resolution as u32);
+        let pass_yuv = if config.video_record {
+            Some(pass::create_yuv(screen_size))
+        } else {
+            None
+        };
 
         let meshes = Meshes::default();
 
@@ -105,6 +114,7 @@ impl Graphics {
             pass_final,
             pass_shadow,
             pass_probe,
+            pass_yuv,
             meshes,
             prgs,
         }
@@ -303,6 +313,10 @@ impl Graphics {
 
     pub fn render_final(&self) {
         pass::render_final(self)
+    }
+
+    pub fn render_yuv(&self) {
+        pass::render_yuv(self)
     }
 
     pub fn bind_forward(&self) {
