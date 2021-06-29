@@ -203,6 +203,14 @@ impl Shader {
         }
     }
 
+    pub fn uniform_color_f(&self, color: &Vec4) {
+        let u: GLint;
+        u = self.uloc[Uniform::Color as usize];
+        unsafe {
+            gl::Uniform4fv(u, 1, color.as_ptr());
+        }
+    }
+
     pub fn uniform_ambient(&self, color: &Vec3) {
         let u: GLint;
         u = self.uloc[Uniform::Ambient as usize];

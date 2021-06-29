@@ -238,7 +238,7 @@ pub struct DrawImage {
     pub rotation: f32,
 
     pub blend_mode: (),
-    pub color: Vec3,
+    pub color: Vec4,
 }
 impl From<DrawImage> for RenderOp {
     fn from(x: DrawImage) -> Self {
@@ -257,7 +257,7 @@ pub struct DrawBillboard {
     pub size: Vec2,
     pub rotation: f32,
     pub blend_mode: (),
-    pub color: Vec3,
+    pub color: Vec4,
 }
 impl From<DrawBillboard> for RenderOp {
     fn from(x: DrawBillboard) -> Self {

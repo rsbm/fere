@@ -19,15 +19,16 @@ impl RenderContext {
         for image in &self.draw_images {
             image.texture.bind_at(0);
             let image_size: Vec2 = nalgebra::convert(image.texture.size);
-            let pos = image.pos.component_div(&screen_size) - Vec2::new(0.5, 0.5);
+            let pos = image.pos.component_div(&screen_size) - Vec2::new(1.0, 1.0);
             let size = image
                 .size
                 .component_mul(&image_size)
                 .component_div(&screen_size)
                 * 2.0;
             let trans = glm::translate(&Mat4::identity(), &Vec3::new(pos.x, pos.y, 0.0));
-            let trans = glm::scale(&trans, &Vec3::new(size.x, size.y, 1.0));
+            let trans = glm::scale(&trans, &Vec3::new(size.x, -size.y, 1.0));
             let trans = glm::rotate(&trans, image.rotation, &Vec3::new(0.0, 0.0, -1.0));
+            prg.uniform_color_f(&image.color);
             prg.uniform_model(&trans, false);
             arr.draw();
         }
@@ -70,6 +71,8 @@ impl RenderContext {
             arr.draw();
         }
 
+        let prg = self.graphics.prgs.image.as_ref();
+        prg.bind();
         let runit = RenderUnit {
             color: true,
             depth: true,
@@ -97,8 +100,9 @@ impl RenderContext {
                 .component_div(&screen_size)
                 * 2.0;
             let trans = glm::translate(&Mat4::identity(), &Vec3::new(pos.x, pos.y, 0.0));
-            let trans = glm::scale(&trans, &Vec3::new(size.x, size.y, 1.0));
+            let trans = glm::scale(&trans, &Vec3::new(size.x, -size.y, 1.0));
             let trans = glm::rotate(&trans, billboard.rotation, &Vec3::new(0.0, 0.0, -1.0));
+            prg.uniform_color_f(&billboard.color);
             prg.uniform_model(&trans, false);
             arr.draw();
         }
