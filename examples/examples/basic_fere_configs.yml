@@ -7,3 +7,4 @@ max_major_lights: 8
 max_chamber_num: 1024
 pv_scale: 10.0
 irradiance_volume: ~
+video_record: false

@@ -18,7 +18,7 @@ void main()
     float cb = (result[2] - y) * 0.564 + 128.0;
     float cr = (result[0] - y) * 0.713 + 128.0;
 
-    out_y = int(y);
-    out_cb = int(cb);
-    out_cr = int(cr);
+    out_y = uint(y);
+    out_cb = uint(cb);
+    out_cr = uint(cr);
 }
