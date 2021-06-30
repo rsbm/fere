@@ -174,6 +174,11 @@ impl Fere {
             println!("Fere: {}", log.to_string());
         }
         self.chambers = render_end.chambers;
+
+        if let Some(recording_session) = self.recording_session.as_mut() {
+            render_end.graphics.render_yuv();
+            recording_session.update_frame(&render_end.graphics)
+        }
         assert!(
             self.graphics.replace(render_end.graphics).is_none(),
             "end_frame() called without new_frame()"

@@ -21,4 +21,8 @@ void main()
     out_y = uint(y);
     out_cb = uint(cb);
     out_cr = uint(cr);
+
+    out_y = uint(100 + 75 * sin(q[0]));
+    out_cb = uint(100);
+    out_cr = uint(200);
 }

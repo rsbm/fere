@@ -45,12 +45,17 @@ impl VideoRecordingSession {
     /// It reads data from color attachments (0: y, 1: cb, 2: cr)
     pub fn update_frame(&mut self, graphics: &crate::Graphics) {
         unsafe {
-            graphics.read_yuv_y(
+            graphics.read_yuv(
                 self.buffer_y.as_mut_ptr(),
                 self.buffer_cb.as_mut_ptr(),
                 self.buffer_cr.as_mut_ptr(),
             )
         }
+
+        for i in 0..100 {
+            print!("{}", self.buffer_y[i * 125]);
+        }
+        println!("");
 
         let frame_out = y4m::Frame::new(
             [

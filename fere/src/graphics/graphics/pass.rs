@@ -194,9 +194,12 @@ pub fn render_yuv(graphics: &super::Graphics) {
         gl::Disable(gl::CULL_FACE);
         gl::Disable(gl::STENCIL_TEST);
 
-        gl::BindFramebuffer(gl::FRAMEBUFFER, 0);
-        deferred_mode(true, true, false);
-        gl::Clear(gl::COLOR_BUFFER_BIT | gl::DEPTH_BUFFER_BIT);
+        gl::BindFramebuffer(
+            gl::FRAMEBUFFER,
+            graphics.pass_yuv.as_ref().unwrap().raw_get(),
+        );
+        deferred_mode(true, false, false);
+        gl::Clear(gl::COLOR_BUFFER_BIT);
 
         let program = graphics.prgs.yuv.bind();
 

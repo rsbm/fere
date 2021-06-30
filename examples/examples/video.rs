@@ -10,6 +10,8 @@ struct Scene {
     renderer: Fere,
     world: Option<Box<World>>,
     resources: Arc<Resources>,
+
+    frame_count: usize,
 }
 
 struct Resources {
@@ -44,6 +46,10 @@ fn cos(x: f32) -> f32 {
     x.cos()
 }
 
+fn posco(x: f32) -> f32 {
+    1.0 + x.cos() * 0.5
+}
+
 impl World {
     fn new() -> Self {
         let mut rng = thread_rng();
@@ -56,34 +62,39 @@ impl World {
     fn update(&mut self) {
         let params = [(1.0, 2.0), (3.0, 2.0), (4.0, 1.0), (2.0, 2.0)];
 
-        if self.time % 10 == 0 {
-            let t = self.time as f32 * 0.001;
+        if self.time % 2 == 0 {
+            let t = self.time as f32 * 0.1;
 
             let sp_pos: Vec<_> = params
                 .iter()
                 .map(|(a, b)| {
                     let a = *a;
                     let b = *b;
-                    let x = cos(cos(t * 0.4) * (cos(a) + 1.1)) * 100.0
+                    let x = cos(cos(t * (0.4 + posco(a)) * 0.4) * (cos(a) + 1.1)) * 200.0
                         + cos(cos(t * 0.3 * cos(b))) * 10.0;
-                    let y = cos(cos(t * 0.4) * (cos(b) + 1.1)) * 100.0
+                    let y = cos(cos(t * (0.4 + posco(a)) * 0.4) * (cos(b) + 1.1)) * 200.0
                         + cos(cos(t * 0.3 * cos(a))) * 10.0;
                     let z = 0.0;
                     Vec3::new(x, y, z)
                 })
                 .collect();
 
-            for sp in sp_pos {
+            for (s, sp) in sp_pos.iter().enumerate() {
                 for i in 0..30 {
-                    let angle = ((t as i32 + (i as i32) * 2) as f32).to_radians();
-                    let speed = Vec3::new(angle.cos(), angle.sin(), 0.0) * 1.3;
-                    self.particles.push(Particle {
-                        pos: sp,
-                        speed,
-                        acc: Vec3::new(0.0, 0.0, 0.0),
-                        color: gen_color(t),
-                        size: 0.5,
-                    });
+                    let at = (i as f32) / 30.0;
+                    let angle = (((t * 2.1 + cos(sp.x)) as i32 * 3 + (i as i32) * 5) as f32)
+                        .to_radians()
+                        + 3.0 * cos(params[s].0);
+                    let speed = Vec3::new(angle.cos(), angle.sin(), 0.0) * (2.0 + at);
+                    for j in 0..3 {
+                        self.particles.push(Particle {
+                            pos: *sp,
+                            speed,
+                            acc: Vec3::new(-speed.y, speed.x, 0.0) * (0.02 + (j as f32) * 0.01),
+                            color: gen_color(t + at * 3.0),
+                            size: 0.5,
+                        });
+                    }
                 }
             }
         }
@@ -92,7 +103,7 @@ impl World {
             x.pos += x.speed;
         });
 
-        self.particles.retain(|x| length(&x.pos) < 500.0);
+        self.particles.retain(|x| length(&x.pos) < 700.0);
         println!("{}", self.particles.len());
         self.time += 1;
     }
@@ -100,12 +111,13 @@ impl World {
 
 impl Program for Scene {
     fn new() -> Self {
-        let renderer = Fere::new(
-            serde_yaml::from_str(
-                &std::fs::read_to_string("./examples/examples/basic_fere_configs.yml").unwrap(),
-            )
-            .unwrap(),
-        );
+        let mut config: FereConfigs = serde_yaml::from_str(
+            &std::fs::read_to_string("./examples/examples/basic_fere_configs.yml").unwrap(),
+        )
+        .unwrap();
+        config.video_record = true;
+        let mut renderer = Fere::new(config);
+        renderer.start_recording(5555).unwrap();
         let world = Some(Box::new(World::new()));
         Scene {
             renderer,
@@ -113,6 +125,7 @@ impl Program for Scene {
                 triangle: fere_examples::read_texture("triangle.png"),
             }),
             world,
+            frame_count: 0,
         }
     }
 
@@ -142,6 +155,13 @@ impl Program for Scene {
         let render_thread = std::thread::spawn(|| render(frame, resources, world));
         self.renderer.end_frame(renderer.render());
         self.world = Some(render_thread.join().unwrap());
+
+        self.frame_count += 1;
+        if self.frame_count == 200 {
+            self.renderer.end_recording().unwrap();
+            return "exit".to_owned();
+        }
+
         "continue".to_owned()
     }
 }

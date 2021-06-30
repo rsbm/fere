@@ -42,7 +42,7 @@ impl Graphics {
         gl::ReadPixels(0, 0, size.x, size.y, gl::RGB, gl::FLOAT, buffer.cast());
     }
 
-    pub unsafe fn read_yuv_y(&self, buffer_y: *mut u8, buffer_cb: *mut u8, buffer_cr: *mut u8) {
+    pub unsafe fn read_yuv(&self, buffer_y: *mut u8, buffer_cb: *mut u8, buffer_cr: *mut u8) {
         let pass_yuv = self.pass_yuv.as_ref().unwrap();
         let size = pass_yuv.outputs_get()[0].size_get();
         gl::BindFramebuffer(gl::FRAMEBUFFER, pass_yuv.raw_get());
