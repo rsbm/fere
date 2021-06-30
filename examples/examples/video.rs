@@ -150,11 +150,18 @@ fn render(mut frame: Frame, resources: Arc<Resources>, world: Box<World>) -> Box
     for p in &world.particles {
         frame.push(rops::DrawBillboard {
             texture: Arc::clone(&resources.triangle),
+            depth_test: false,
+            depth_write: false,
             pos: p.pos,
             size: Vec2::from_element(p.size),
-            rotation: f32::atan2(p.speed.y, p.speed.x),
+            rotation: f32::atan2(p.speed.y, p.speed.x) - (90.0 as f32).to_radians(),
             blend_mode: (),
-            color: nalgebra::convert::<IVec3, Vec3>(p.color) / 255.0,
+            color: Vec4::new(
+                p.color.x as f32 / 255.0,
+                p.color.y as f32 / 255.0,
+                p.color.z as f32 / 255.0,
+                0.5,
+            ),
         });
     }
     frame.end();

@@ -250,9 +250,11 @@ impl From<DrawImage> for RenderOp {
 pub struct DrawBillboard {
     pub texture: Arc<Texture>,
 
+    pub depth_test: bool,
+    pub depth_write: bool,
+
     /// Of the center of the image, from the center of the screen as (0, 0).
     pub pos: Vec3,
-
     /// In scale.
     pub size: Vec2,
     pub rotation: f32,

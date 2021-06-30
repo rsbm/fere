@@ -73,10 +73,11 @@ impl RenderContext {
 
         let prg = self.graphics.prgs.image.as_ref();
         prg.bind();
+        // FIXME: depth and depth_test are parameters of the rop
         let runit = RenderUnit {
             color: true,
-            depth: true,
-            depth_test: true,
+            depth: false,
+            depth_test: false,
             id: None,
             lighting: None,
         };
