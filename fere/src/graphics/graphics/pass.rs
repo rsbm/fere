@@ -52,9 +52,9 @@ pub fn create_probe(size: u32) -> FrameBuffer {
 
 pub fn create_yuv(size: IVec2) -> FrameBuffer {
     let outputs = vec![
-        TextureInternal2D::new(InternalTexType::Material, size),
-        TextureInternal2D::new(InternalTexType::Material, size),
-        TextureInternal2D::new(InternalTexType::Material, size),
+        TextureInternal2D::new(InternalTexType::Yuv, size),
+        TextureInternal2D::new(InternalTexType::Yuv, size),
+        TextureInternal2D::new(InternalTexType::Yuv, size),
     ];
     FrameBuffer::new(outputs, None)
 }
@@ -186,7 +186,8 @@ pub fn render_final(graphics: &super::Graphics) {
 
 pub fn render_yuv(graphics: &super::Graphics) {
     deferred_mode(true, false, false);
-
+    graphics.pass_yuv.as_ref().unwrap().bind();
+    graphics.pass_yuv.as_ref().unwrap().clear_color_all();
     unsafe {
         gl::Disable(gl::BLEND);
         gl::Disable(gl::DEPTH_TEST);
@@ -198,8 +199,7 @@ pub fn render_yuv(graphics: &super::Graphics) {
             gl::FRAMEBUFFER,
             graphics.pass_yuv.as_ref().unwrap().raw_get(),
         );
-        deferred_mode(true, false, false);
-        gl::Clear(gl::COLOR_BUFFER_BIT);
+        deferred_mode(true, true, false);
 
         let program = graphics.prgs.yuv.bind();
 

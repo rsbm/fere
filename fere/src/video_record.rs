@@ -49,13 +49,9 @@ impl VideoRecordingSession {
                 self.buffer_y.as_mut_ptr(),
                 self.buffer_cb.as_mut_ptr(),
                 self.buffer_cr.as_mut_ptr(),
-            )
+                self.buffer_y.len(),
+            );
         }
-
-        for i in 0..100 {
-            print!("{}", self.buffer_y[i * 125]);
-        }
-        println!("");
 
         let frame_out = y4m::Frame::new(
             [

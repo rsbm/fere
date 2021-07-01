@@ -10,6 +10,7 @@ pub enum InternalTexType {
     Flag,       // Lighting
     Material,   // Roughness, Metalness
     Depth,
+    Yuv,
 }
 
 struct TexParam {
@@ -44,6 +45,7 @@ impl InternalTexType {
             InternalTexType::Flag => (gl::R8I, gl::RED_INTEGER, gl::UNSIGNED_BYTE, 1, 1),
             InternalTexType::Material => (gl::RED, gl::RED, gl::UNSIGNED_BYTE, 1, 1),
             InternalTexType::Depth => (gl::DEPTH_COMPONENT, gl::DEPTH_COMPONENT, gl::FLOAT, 1, 4),
+            InternalTexType::Yuv => (gl::R8UI, gl::RED_INTEGER, gl::UNSIGNED_BYTE, 1, 1),
         })
     }
 }

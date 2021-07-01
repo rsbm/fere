@@ -1,7 +1,6 @@
 #version 330 core
 
 uniform sampler2D u_tex0;
-uniform vec4 u_color;
 
 layout (location = 0) out uint out_y;
 layout (location = 1) out uint out_cb;
@@ -14,15 +13,11 @@ void main()
     vec3 result = texelFetch(u_tex0, p, 0).rgb;
     result *= 255;
 
-    float y = 0.299 * result[0] + 0.587 * result[1] + 0.114 * result[2];
-    float cb = (result[2] - y) * 0.564 + 128.0;
-    float cr = (result[0] - y) * 0.713 + 128.0;
+    float y = clamp(0.299 * result[0] + 0.587 * result[1] + 0.114 * result[2], 0.0, 256.0);
+    float cb = clamp((result[2] - y) * 0.564 + 128.0, 0.0, 256.0);
+    float cr = clamp((result[0] - y) * 0.713 + 128.0, 0.0, 256.0);
 
     out_y = uint(y);
     out_cb = uint(cb);
     out_cr = uint(cr);
-
-    out_y = uint(100 + 75 * sin(q[0]));
-    out_cb = uint(100);
-    out_cr = uint(200);
 }
