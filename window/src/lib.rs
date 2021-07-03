@@ -108,6 +108,7 @@ pub fn run<T: Program>(config: WindowConfig) {
     })
 }
 
+#[allow(clippy::branches_sharing_code)]
 pub fn run_with_imgui<T: ProgramWithImgui>(config: WindowConfig) {
     let event_loop = EventLoop::new();
     let _context = glutin::ContextBuilder::new().with_vsync(false);

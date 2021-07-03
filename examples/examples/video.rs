@@ -174,7 +174,7 @@ fn render(mut frame: Frame, resources: Arc<Resources>, world: Box<World>) -> Box
             depth_write: false,
             pos: p.pos,
             size: Vec2::from_element(p.size),
-            rotation: f32::atan2(p.speed.y, p.speed.x) - (90.0 as f32).to_radians(),
+            rotation: f32::atan2(p.speed.y, p.speed.x) - (90.0_f32).to_radians(),
             blend_mode: (),
             color: Vec4::new(
                 p.color.x as f32 / 255.0,

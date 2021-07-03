@@ -150,7 +150,7 @@ fn render(mut frame: Frame, resources: Arc<Resources>, world: Arc<RwLock<World>>
             depth_write: false,
             pos: p.pos,
             size: Vec2::new(0.3, 0.3),
-            rotation: f32::atan2(p.speed.y, p.speed.x) - (90.0 as f32).to_radians(),
+            rotation: f32::atan2(p.speed.y, p.speed.x) - (90.0_f32).to_radians(),
             blend_mode: (),
             color: Vec4::new(1.0, 0.0, 0.0, 0.7),
         });

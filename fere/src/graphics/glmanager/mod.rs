@@ -2,11 +2,10 @@ mod compile;
 pub mod light;
 pub mod shader;
 
-use super::*;
 use shader::*;
 use std::fs::read_to_string;
 use std::path::PathBuf;
-use std::{collections::HashMap, io::prelude::*, sync::Arc};
+use std::{collections::HashMap, sync::Arc};
 
 fn get_shader_config_path() -> PathBuf {
     let mut path_to_shader = PathBuf::from(env!("CARGO_MANIFEST_DIR"));

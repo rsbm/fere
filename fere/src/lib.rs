@@ -155,13 +155,7 @@ impl Fere {
             recv,
             create_renderer_param(&self.configs, &config),
             self.configs.clone(),
-            self.chambers
-                .iter_mut()
-                .map(|x| match x.take() {
-                    Some(x) => Some(x),
-                    None => None,
-                })
-                .collect(),
+            self.chambers.iter_mut().map(|x| x.take()).collect(),
         );
         (Frame::new(config, send), renderer)
     }

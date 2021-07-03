@@ -1,14 +1,9 @@
 use fere_common::*;
-use log::{info, warn};
-use std::fs::File;
-use std::io;
 use std::net::{TcpListener, TcpStream};
 
 pub struct VideoRecordingSession {
-    port: u16,
     frame_recorded: usize,
     encoder: y4m::Encoder<TcpStream>,
-    size: IVec2,
 
     buffer_y: Vec<u8>,
     buffer_cb: Vec<u8>,
@@ -32,10 +27,8 @@ impl VideoRecordingSession {
 
         let buffer_size = size.x as usize * size.y as usize;
         Self {
-            port,
             frame_recorded: 0,
             encoder,
-            size,
             buffer_y: vec![0; buffer_size],
             buffer_cb: vec![0; buffer_size],
             buffer_cr: vec![0; buffer_size],
@@ -62,6 +55,7 @@ impl VideoRecordingSession {
             None,
         );
         self.encoder.write_frame(&frame_out).unwrap();
+        self.frame_recorded += 1;
     }
 
     /// Returns the session result in a text message.

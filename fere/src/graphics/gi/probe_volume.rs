@@ -147,7 +147,7 @@ impl ProbeVolume {
                     rng.gen_range(0.0..1.0),
                 );
             }
-            let probe = Probe { sh, pos };
+            let probe = Probe { pos, sh };
             probes[ga.get(&i)] = Some(probe);
         }
         let probes: Vec<Probe> = probes.into_iter().map(|x| x.unwrap()).collect();

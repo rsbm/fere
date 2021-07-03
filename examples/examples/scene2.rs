@@ -146,7 +146,7 @@ impl ProgramWithImgui for Scene {
 
 fn render(
     mut frame: Frame,
-    timer: u64,
+    _timer: u64,
     params: &SceneParams,
     state: &SceneState,
     resources: &Resources,

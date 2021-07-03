@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 use super::Texture;
 use crate::graphics::glmanager::shader::{Shader, Uniform};
 use fere_common::*;

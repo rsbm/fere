@@ -8,17 +8,14 @@ mod shading;
 use super::*;
 use crate::frame::OpQueueReceiver;
 use crate::graphics::glmanager::light::{Light, LightDir, LightUni};
-use crate::graphics::glmanager::shader::Shader;
 use crate::graphics::graphics::{
     material::{bind_emissive_static, bind_fixed_color, bind_general},
-    texture_internal::{InternalTexType, TextureInternal2D, TextureInternal3D},
     Graphics,
 };
 use crate::graphics::render_unit::{Lighting, RenderUnit};
 use crate::ops::*;
 use chamber::ChamberContext;
 use fere_common::*;
-use fere_resources::Mesh;
 use std::sync::Arc;
 
 #[derive(Debug, Clone)]
@@ -155,10 +152,7 @@ impl Renderer {
             chamber_contexts: self
                 .chambers
                 .iter_mut()
-                .map(|x| match x.take() {
-                    Some(x) => Some(ChamberContext::new(x)),
-                    None => None,
-                })
+                .map(|x| x.take().map(ChamberContext::new))
                 .collect(),
             draw_images: Default::default(),
             draw_billboarsd: Default::default(),
