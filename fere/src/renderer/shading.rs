@@ -33,7 +33,7 @@ impl RenderContext {
             .expect("You must set camera first");
 
         // # Direct lighting phase
-        self.graphics.bind_deferred_pass2(true);
+        self.graphics.bind_deferred_pass2(false);
 
         // - Omni-lights
         let omni_lights: Vec<&AddAmbientLight> = chamber

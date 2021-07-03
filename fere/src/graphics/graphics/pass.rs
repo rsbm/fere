@@ -189,17 +189,12 @@ pub fn render_yuv(graphics: &super::Graphics) {
     graphics.pass_yuv.as_ref().unwrap().bind();
     graphics.pass_yuv.as_ref().unwrap().clear_color_all();
     unsafe {
+        gl::ColorMask(1, 1, 1, 1);
         gl::Disable(gl::BLEND);
         gl::Disable(gl::DEPTH_TEST);
         gl::Disable(gl::MULTISAMPLE);
         gl::Disable(gl::CULL_FACE);
         gl::Disable(gl::STENCIL_TEST);
-
-        gl::BindFramebuffer(
-            gl::FRAMEBUFFER,
-            graphics.pass_yuv.as_ref().unwrap().raw_get(),
-        );
-        deferred_mode(true, true, false);
 
         let program = graphics.prgs.yuv.bind();
 
@@ -231,14 +226,14 @@ pub fn bind_forward(_graphics: &super::Graphics) {
     }
 }
 
-pub fn bind_2d(_graphics: &super::Graphics) {
+pub fn bind_2d(graphics: &super::Graphics) {
     deferred_mode(true, false, false);
+    graphics.pass_final.bind();
     unsafe {
         gl::Enable(gl::BLEND);
         gl::Disable(gl::DEPTH_TEST);
         gl::Disable(gl::MULTISAMPLE);
         gl::Disable(gl::CULL_FACE);
         gl::BlendFunc(gl::SRC_ALPHA, gl::ONE_MINUS_SRC_ALPHA);
-        gl::BindFramebuffer(gl::FRAMEBUFFER, 0);
     }
 }

@@ -171,6 +171,7 @@ impl Renderer {
         loop {
             match self.object_queue.recv().unwrap() {
                 RenderOp::EndFrame(_) => {
+                    ctx.graphics.bind_deferred_pass2(true);
                     // FIXME: Update only one.
                     if self.params.enable_irradiance_volume {
                         for i in 0..self.fere_configs.max_chamber_num {
@@ -186,10 +187,9 @@ impl Renderer {
                         }
                     }
 
-                    ctx.graphics.render_final();
-
                     ctx.graphics.bind_2d();
                     ctx.render_images();
+                    ctx.graphics.render_final();
 
                     self.logs.append(&mut ctx.logs);
                     return RenderEnd {
