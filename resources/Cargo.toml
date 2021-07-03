@@ -3,6 +3,14 @@ name = "fere-resources"
 version = "0.0.0"
 authors = ["Junha Yang <junhayang1@gmail.com>"]
 edition = '2018'
+license = "MIT"
+readme = "README.md"
+repository = "https://github.com/rsbm/fere"
+description = """
+Various graphical resources for Fere.
+"""
+categories = ["graphics", "rendering", "multimedia"]
+keywords = ["game", "graphics", "rendering", "fere"]
 
 [dependencies]
 fere-common = { path = "../common" }

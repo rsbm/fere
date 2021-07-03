@@ -3,7 +3,16 @@ name = "fere"
 version = "0.0.0"
 authors = ["Junha Yang <junhayang1@gmail.com>"]
 edition = '2018'
-include = ["src/**/*", "Cargo.toml", "shaders/**/*"]
+include = ["src/**/*", "Cargo.toml", "shaders/**/*", "resources/**/*"]
+license = "MIT"
+readme = "README.md"
+repository = "https://github.com/rsbm/fere"
+description = """
+A 3D rendering engine focused on simple use and realtime global illumination.
+"""
+categories = ["graphics", "rendering"]
+keywords = ["game", "graphics", "rendering", "fere"]
+
 
 [dependencies]
 serde = { version = "1.0", features = ["derive"] }
@@ -22,3 +31,7 @@ strum_macros = "0.18.0"
 heck = "0.3.1"
 serde_json = "1"
 y4m = "0.7.0"
+include_dir = "0.6"
+
+[features]
+include_resources_and_shaders = []

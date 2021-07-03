@@ -3,21 +3,21 @@ pub mod light;
 pub mod shader;
 
 use shader::*;
-use std::fs::read_to_string;
-use std::path::PathBuf;
 use std::{collections::HashMap, sync::Arc};
 
-fn get_shader_config_path() -> PathBuf {
-    let mut path_to_shader = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
+#[cfg(not(feature = "include_resources_and_shaders"))]
+fn get_shader_config_path() -> std::path::PathBuf {
+    let mut path_to_shader = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"));
     path_to_shader.push("shaders/config.yaml");
     path_to_shader
 }
-
-fn get_shader_path(path: &str) -> PathBuf {
-    let mut path_to_shader = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
+#[cfg(not(feature = "include_resources_and_shaders"))]
+fn get_shader_path(path: &str) -> std::path::PathBuf {
+    let mut path_to_shader = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"));
     path_to_shader.push(format!("shaders/{}", path));
     path_to_shader
 }
+
 pub struct GlManager {
     programs: HashMap<String, Arc<Shader>>,
 }
@@ -35,23 +35,53 @@ impl GlManager {
             }
         }
 
+        #[cfg(not(feature = "include_resources_and_shaders"))]
         let programs_: HashMap<String, (String, String)> =
-            serde_yaml::from_str(&read_to_string(get_shader_config_path()).unwrap()).unwrap();
+            serde_yaml::from_str(&std::fs::read_to_string(get_shader_config_path()).unwrap())
+                .unwrap();
+        #[cfg(feature = "include_resources_and_shaders")]
+        let programs_: HashMap<String, (String, String)> = serde_yaml::from_str(
+            crate::included_files::SHADERS
+                .get_file("config.yaml")
+                .unwrap()
+                .contents_utf8()
+                .unwrap(),
+        )
+        .unwrap();
 
         let mut programs = HashMap::new();
 
         for (name, (vert, frag)) in programs_ {
-            let vert = get_shader_path(&vert);
-            let frag = get_shader_path(&frag);
+            #[cfg(feature = "include_resources_and_shaders")]
+            let (vert_source, frag_source) = {
+                (
+                    crate::included_files::SHADERS
+                        .get_file(&vert)
+                        .unwrap()
+                        .contents_utf8()
+                        .unwrap()
+                        .to_owned(),
+                    crate::included_files::SHADERS
+                        .get_file(&frag)
+                        .unwrap()
+                        .contents_utf8()
+                        .unwrap()
+                        .to_owned(),
+                )
+            };
+            #[cfg(not(feature = "include_resources_and_shaders"))]
+            let (vert_source, frag_source) = {
+                let vert = get_shader_path(&vert);
+                let frag = get_shader_path(&frag);
+                (
+                    std::fs::read_to_string(vert).unwrap(),
+                    std::fs::read_to_string(frag).unwrap(),
+                )
+            };
+
             programs.insert(
                 name.clone(),
-                Arc::new(Shader::new(
-                    name,
-                    &read_to_string(vert.clone()).unwrap(),
-                    vert.to_str().unwrap(),
-                    &read_to_string(frag.clone()).unwrap(),
-                    frag.to_str().unwrap(),
-                )),
+                Arc::new(Shader::new(name, &vert_source, &vert, &frag_source, &frag)),
             );
         }
         GlManager { programs }

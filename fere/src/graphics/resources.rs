@@ -1,13 +1,24 @@
 use fere_resources::{mesh::obj, Mesh};
-use std::fs::File;
 use std::io::BufReader;
-use std::path::PathBuf;
 use std::sync::Arc;
 
+#[cfg(not(feature = "include_resources_and_shaders"))]
 fn read_mesh(name: &str) -> Arc<Mesh> {
-    let mut path = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
+    let mut path = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"));
     path.push(format!("resources/mesh/{}", name));
-    let file = File::open(path).unwrap();
+    let file = std::fs::File::open(path).unwrap();
+    let mesh_data = obj::import_single(name, BufReader::new(file)).unwrap();
+    let mut mesh = Mesh::new(None, mesh_data);
+    mesh.buffer();
+    Arc::new(mesh)
+}
+
+#[cfg(feature = "include_resources_and_shaders")]
+fn read_mesh(name: &str) -> Arc<Mesh> {
+    let file = crate::included_files::RESOURCES
+        .get_file(format!("mesh/{}", name))
+        .unwrap()
+        .contents();
     let mesh_data = obj::import_single(name, BufReader::new(file)).unwrap();
     let mut mesh = Mesh::new(None, mesh_data);
     mesh.buffer();

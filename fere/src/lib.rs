@@ -17,6 +17,13 @@ use ops::ChamberIndex;
 use renderer::{RenderEnd, Renderer, RendererParams};
 use thiserror::Error;
 
+#[cfg(feature = "include_resources_and_shaders")]
+mod included_files {
+    use include_dir::{include_dir, Dir};
+    pub const RESOURCES: Dir = include_dir!("./resources");
+    pub const SHADERS: Dir = include_dir!("./shaders");
+}
+
 pub mod prelude {
     pub use crate::configs::FereConfigs;
     pub use crate::frame::{Frame, FrameConfig};
