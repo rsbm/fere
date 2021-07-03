@@ -5,7 +5,7 @@ authors = ["Junha Yang <junhayang1@gmail.com>"]
 edition = '2018'
 include = ["src/**/*", "Cargo.toml", "shaders/**/*", "resources/**/*"]
 license = "MIT"
-readme = "README.md"
+readme = "../README.md"
 repository = "https://github.com/rsbm/fere"
 description = """
 A 3D rendering engine focused on simple use and realtime global illumination.
