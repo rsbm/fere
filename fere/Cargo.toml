@@ -17,8 +17,8 @@ keywords = ["game", "graphics", "rendering", "fere"]
 [dependencies]
 serde = { version = "1.0", features = ["derive"] }
 serde_yaml = "0.8"
-fere-common = { path = "../common" }
-fere-resources = { path = "../resources" }
+fere-common = { version = "0.0.0", path = "../common" }
+fere-resources = { version = "0.0.0", path = "../resources" }
 thiserror = "1.0"
 log = "0.4"
 chrono = "0.4"

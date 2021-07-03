@@ -13,7 +13,7 @@ categories = ["graphics", "rendering", "multimedia"]
 keywords = ["game", "graphics", "rendering", "fere"]
 
 [dependencies]
-fere-common = { path = "../common" }
+fere-common = { version = "0.0.0", path = "../common" }
 gl = "0.14.0"
 image = "0.23"
 serde = "1.0"
