@@ -25,7 +25,7 @@ mod included_files {
 }
 
 pub mod prelude {
-    pub use crate::configs::FereConfigs;
+    pub use crate::configs::{FereConfigs, IrradianceVolumeConfigs};
     pub use crate::frame::{Frame, FrameConfig};
     pub use crate::{ops as rops, renderer::Renderer, ChamberConfig, Error, Fere};
     pub use fere_common::{self, *};

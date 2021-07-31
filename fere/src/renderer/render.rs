@@ -162,6 +162,8 @@ impl RenderContext {
                 };
                 self.graphics.ru_set(prg, &runit);
                 mesh.bind();
+
+                bind_fixed_color(&prg, &color); // Hmm we have to use another program than standard?
                 prg.uniform_wireframe(&trans, &color, width);
                 mesh.draw_wireframe();
                 Ok(None)
