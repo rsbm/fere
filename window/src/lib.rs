@@ -148,7 +148,7 @@ pub fn run_with_imgui<T: ProgramWithImgui>(config: WindowConfig) {
     let mut platform = WinitPlatform::init(&mut imgui);
     {
         let window = main_window.window();
-        platform.attach_window(imgui.io_mut(), &window, HiDpiMode::Rounded);
+        platform.attach_window(imgui.io_mut(), window, HiDpiMode::Rounded);
     }
 
     let hidpi_factor = platform.hidpi_factor();

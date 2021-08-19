@@ -95,7 +95,7 @@ pub fn read_mesh(name: &str) -> Arc<Mesh> {
 pub fn read_texture(name: &str) -> Arc<Texture> {
     let mut path = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
     path.push(format!("resources/textures/{}", name));
-    let texture_data = fere_resources::texture::import(&name, {
+    let texture_data = fere_resources::texture::import(name, {
         let file = File::open(path).unwrap();
         BufReader::new(file)
     })

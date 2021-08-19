@@ -238,7 +238,7 @@ impl Graphics {
     }
 
     pub fn draw_lightvolume_dir(&self, program: &Shader, light: &LightDir, cpos: Vec3) {
-        program.uniform_light_dir(&light, 0);
+        program.uniform_light_dir(light, 0);
         program.uniform_camera(&cpos);
 
         let trans = Self::get_transform_for_lightvolume_dir(light);
@@ -259,7 +259,7 @@ impl Graphics {
         let trans = glm::scale(&trans, size);
         let trans = glm::translate(&trans, &Vec3::new(0.0, 0.0, 0.5));
         program.uniform_model(&trans, false);
-        program.uniform_camera(&cpos);
+        program.uniform_camera(cpos);
         self.draw_lighvolume_common(&self.meshes.cube);
     }
 

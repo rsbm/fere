@@ -51,7 +51,7 @@ impl RenderContext {
                 self.graphics.ru_set(prg, &runit);
                 let arr = &self.graphics.meshes().line;
                 arr.bind();
-                bind_fixed_color(&prg, &color);
+                bind_fixed_color(prg, &color);
                 prg.uniform_line(&pos1, &pos2, width);
                 arr.draw_line();
                 Ok(None)
@@ -72,7 +72,8 @@ impl RenderContext {
 
                 prg.uniform_model(&object.trans, false);
                 object.mesh.bind();
-                bind_general(&prg, &surface);
+
+                bind_general(prg, &surface);
                 object.mesh.draw();
 
                 if object.shadow {
@@ -105,7 +106,7 @@ impl RenderContext {
 
                 prg.uniform_model(&object.trans, false);
                 object.mesh.bind();
-                bind_emissive_static(&prg, &surface, 0.0);
+                bind_emissive_static(prg, &surface, 0.0);
                 object.mesh.draw();
 
                 if object.shadow {
@@ -163,7 +164,7 @@ impl RenderContext {
                 self.graphics.ru_set(prg, &runit);
                 mesh.bind();
 
-                bind_fixed_color(&prg, &color); // Hmm we have to use another program than standard?
+                bind_fixed_color(prg, &color); // Hmm we have to use another program than standard?
                 prg.uniform_wireframe(&trans, &color, width);
                 mesh.draw_wireframe();
                 Ok(None)

@@ -1,6 +1,6 @@
 [package]
 name = "fere"
-version = "0.0.0"
+version = "0.0.1"
 authors = ["Junha Yang <junhayang1@gmail.com>"]
 edition = '2018'
 include = ["src/**/*", "Cargo.toml", "shaders/**/*", "resources/**/*"]
@@ -17,8 +17,8 @@ keywords = ["game", "graphics", "rendering", "fere"]
 [dependencies]
 serde = { version = "1.0", features = ["derive"] }
 serde_yaml = "0.8"
-fere-common = { version = "0.0.0", path = "../common" }
-fere-resources = { version = "0.0.0", path = "../resources" }
+fere-common = { path = "../common" }
+fere-resources = { path = "../resources" }
 thiserror = "1.0"
 log = "0.4"
 chrono = "0.4"

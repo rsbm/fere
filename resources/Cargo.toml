@@ -1,6 +1,6 @@
 [package]
 name = "fere-resources"
-version = "0.0.0"
+version = "0.0.1"
 authors = ["Junha Yang <junhayang1@gmail.com>"]
 edition = '2018'
 license = "MIT"
@@ -13,7 +13,7 @@ categories = ["graphics", "rendering", "multimedia"]
 keywords = ["game", "graphics", "rendering", "fere"]
 
 [dependencies]
-fere-common = { version = "0.0.0", path = "../common" }
+fere-common = { path = "../common" }
 gl = "0.14.0"
 image = "0.23"
 serde = "1.0"

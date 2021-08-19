@@ -67,6 +67,8 @@ struct RenderContext {
     draw_images: Vec<DrawImage>,
     draw_billboarsd: Vec<DrawBillboard>,
     show_internal_textures: Vec<ShowInternalTexture>,
+
+    _starting_instant: std::time::Instant,
 }
 
 impl RenderContext {
@@ -157,6 +159,8 @@ impl Renderer {
             draw_images: Default::default(),
             draw_billboarsd: Default::default(),
             show_internal_textures: Default::default(),
+
+            _starting_instant: std::time::Instant::now(),
         }
     }
 

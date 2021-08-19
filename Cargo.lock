@@ -462,7 +462,7 @@ checksum = "e78d4f1cc4ae33bbfc157ed5d5a5ef3bc29227303d595861deb238fcec4e9457"
 
 [[package]]
 name = "fere"
-version = "0.0.0"
+version = "0.0.1"
 dependencies = [
  "chrono",
  "crossbeam",
@@ -485,7 +485,7 @@ dependencies = [
 
 [[package]]
 name = "fere-common"
-version = "0.0.0"
+version = "0.0.1"
 dependencies = [
  "nalgebra",
  "nalgebra-glm",
@@ -515,7 +515,7 @@ dependencies = [
 
 [[package]]
 name = "fere-resources"
-version = "0.0.0"
+version = "0.0.1"
 dependencies = [
  "fere-common",
  "gl",

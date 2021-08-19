@@ -1,6 +1,6 @@
 [package]
 name = "fere-common"
-version = "0.0.0"
+version = "0.0.1"
 authors = ["Junha Yang <junhayang1@gmail.com>"]
 edition = '2018'
 license = "MIT"

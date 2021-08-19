@@ -15,7 +15,7 @@ impl RenderContext {
         };
         self.graphics.ru_set(prg, &runit);
         for object in &chamber.emissive_static_objects {
-            bind_emissive_static(&prg, &object.surface, 0.0);
+            bind_emissive_static(prg, &object.surface, 0.0);
             prg.uniform_model(&object.trans, false);
             object.mesh.bind();
             object.mesh.draw();

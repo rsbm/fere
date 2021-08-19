@@ -74,7 +74,7 @@ impl RenderContext {
         // - Major lights
         for major_light in &chamber.major_lights {
             // Step1: Draw the world again
-            let (light, camera) = common::prepare_major_light(&major_light);
+            let (light, camera) = common::prepare_major_light(major_light);
 
             self.graphics.bind_shadow(0);
             let prg = self.graphics.prgs.shadow_1.bind();

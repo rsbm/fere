@@ -89,7 +89,7 @@ impl GlManager {
 
     pub fn get_program(&self, key: &str) -> Arc<Shader> {
         let program = self.programs.get(key).unwrap();
-        Arc::clone(&program)
+        Arc::clone(program)
     }
 }
 
