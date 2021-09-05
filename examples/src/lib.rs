@@ -1,7 +1,4 @@
-use fere::prelude::{
-    fere_resources::{Mesh, Texture},
-    *,
-};
+use fere::prelude::*;
 use rand::prelude::*;
 use rops::*;
 use std::fs::File;

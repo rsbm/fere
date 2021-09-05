@@ -1,4 +1,4 @@
-use fere::prelude::{fere_resources::Texture, *};
+use fere::prelude::*;
 use fere_window::*;
 use parking_lot::RwLock;
 use rand::prelude::*;

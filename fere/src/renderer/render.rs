@@ -1,4 +1,5 @@
 use super::*;
+use crate::prelude::*;
 use chamber::*;
 
 impl RenderContext {
@@ -127,12 +128,12 @@ impl RenderContext {
 
                 if let Some(point_light) = point_light {
                     let emission = match surface.timepoints[0].emission {
-                            fere_resources::surface::TexVar::T(_) => return Err(OpError::Other("`point_light` in `DrawEmissiveStatic` is not implemented for a textured surface.".to_owned())),
-                            fere_resources::surface::TexVar::U(x) => x,
+                            surface::TexVar::T(_) => return Err(OpError::Other("`point_light` in `DrawEmissiveStatic` is not implemented for a textured surface.".to_owned())),
+                            surface::TexVar::U(x) => x,
                         };
                     let emission_intensity = match &surface.timepoints[0].emission_intensity {
-                            fere_resources::surface::TexVar::T(_) => return Err(OpError::Other("`point_light` in `DrawEmissiveStatic` is not implemented for a textured surface.".to_owned())),
-                            fere_resources::surface::TexVar::U(x) => x,
+                            surface::TexVar::T(_) => return Err(OpError::Other("`point_light` in `DrawEmissiveStatic` is not implemented for a textured surface.".to_owned())),
+                            surface::TexVar::U(x) => x,
                         };
 
                     Ok(Some(RenderOp::AddPointLight(AddPointLight {

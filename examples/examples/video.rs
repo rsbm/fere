@@ -1,6 +1,6 @@
 #![allow(clippy::many_single_char_names)]
 
-use fere::prelude::{fere_resources::Texture, *};
+use fere::prelude::*;
 use fere_window::*;
 use rand::prelude::*;
 use rayon::prelude::*;

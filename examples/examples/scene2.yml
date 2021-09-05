@@ -9,3 +9,4 @@ fere_configs:
   max_chamber_num: 1024
   pv_scale: 24.0
   irradiance_volume: {}
+  video_record: false

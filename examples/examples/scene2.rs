@@ -1,12 +1,11 @@
 use fere::prelude::*;
-use fere_resources::surface::{no_normal_map, EmissiveStaticI, GeneralI, TexVar, TimepointI};
-use fere_resources::Mesh;
 use fere_util::ui::camera_control::CameraControl;
 use fere_util::ui::input_manager::InputManager;
 use fere_window::*;
 use rand::prelude::*;
 use rops::*;
 use std::sync::Arc;
+use surface::{no_normal_map, EmissiveStaticI, GeneralI, TexVar, TimepointI};
 
 #[derive(Debug, serde::Deserialize)]
 struct SceneParams {

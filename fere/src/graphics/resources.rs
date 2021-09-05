@@ -1,4 +1,5 @@
-use fere_resources::{mesh::obj, Mesh};
+use crate::resources::Mesh;
+use fere_resources::mesh::obj;
 use std::io::BufReader;
 use std::sync::Arc;
 

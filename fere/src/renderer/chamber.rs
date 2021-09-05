@@ -1,6 +1,5 @@
 use super::*;
-use fere_resources::surface;
-use fere_resources::Mesh;
+use crate::prelude::*;
 
 #[derive(Debug)]
 pub(crate) struct ChamberShadowObject {

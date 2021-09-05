@@ -13,12 +13,12 @@ pub enum InternalTexType {
     Yuv,
 }
 
-struct TexParam {
-    internal_format: GLenum,
-    format: GLenum,
-    data_type: GLenum,
-    num: usize,
-    _size: usize,
+pub struct TexParam {
+    pub internal_format: GLenum,
+    pub format: GLenum,
+    pub data_type: GLenum,
+    pub num: usize,
+    pub _size: usize,
 }
 
 impl TexParam {
@@ -35,7 +35,7 @@ impl TexParam {
 
 impl InternalTexType {
     /// (..., num, size)
-    fn tex_parameters(&self) -> TexParam {
+    pub(crate) fn tex_parameters(&self) -> TexParam {
         TexParam::new(match self {
             InternalTexType::Float1 => (gl::RED, gl::RED, gl::FLOAT, 1, 4),
             InternalTexType::Float3 => (gl::RGB32F, gl::RGB, gl::FLOAT, 3, 4),
@@ -101,6 +101,10 @@ impl TextureInternal2D {
             size,
             tex_param,
         }
+    }
+
+    pub fn tex_param(&self) -> &TexParam {
+        &self.tex_param
     }
 
     fn parameters_set() {

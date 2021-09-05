@@ -1,9 +1,8 @@
 #![allow(dead_code)]
 
-use super::Texture;
 use crate::graphics::glmanager::shader::{Shader, Uniform};
+use crate::resources::{surface::*, *};
 use fere_common::*;
-use fere_resources::surface::*;
 use std::sync::Arc;
 
 /*

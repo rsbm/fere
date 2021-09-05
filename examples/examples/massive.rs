@@ -1,12 +1,11 @@
 use fere::prelude::*;
-use fere_resources::surface::{no_normal_map, GeneralI, TexVar};
-use fere_resources::Mesh;
 use fere_window::*;
 use parking_lot::RwLock;
 use rand::prelude::*;
 use rops::*;
 use std::sync::Arc;
 use std::time::Instant;
+use surface::{no_normal_map, GeneralI, TexVar};
 
 struct SceneState {
     /// radius, angle_speed, num, angle

@@ -3,6 +3,7 @@ mod frame;
 mod graphics;
 pub mod ops;
 mod renderer;
+pub mod resources;
 mod video_record;
 
 use crate::graphics::gi::probe_volume::ProbeVolumeSuite;
@@ -15,6 +16,8 @@ use frame::{Frame, FrameConfig};
 use frame::{OpQueueReceiver, OpQueueSender};
 use ops::ChamberIndex;
 use renderer::{RenderEnd, Renderer, RendererParams};
+use std::cell::RefCell;
+use std::thread::ThreadId;
 use thiserror::Error;
 
 #[cfg(feature = "include_resources_and_shaders")]
@@ -27,6 +30,7 @@ mod included_files {
 pub mod prelude {
     pub use crate::configs::{FereConfigs, IrradianceVolumeConfigs};
     pub use crate::frame::{Frame, FrameConfig};
+    pub use crate::resources::*;
     pub use crate::{ops as rops, renderer::Renderer, ChamberConfig, Error, Fere};
     pub use fere_common::{self, *};
     pub use fere_resources;
@@ -76,6 +80,14 @@ pub struct Chamber {
     state: ChamberState,
 }
 
+thread_local! {
+    static MAIN_THREAD_ID: RefCell<Option<ThreadId>> = RefCell::new(None);
+}
+
+fn is_main_thread() -> bool {
+    MAIN_THREAD_ID.with(|x| *x.borrow().as_ref().unwrap() == std::thread::current().id())
+}
+
 /// The Fere instance.
 pub struct Fere {
     graphics: Option<Graphics>,
@@ -87,6 +99,9 @@ pub struct Fere {
 
 impl Fere {
     pub fn new(configs: FereConfigs) -> Self {
+        MAIN_THREAD_ID.with(|x| {
+            *x.borrow_mut() = Some(std::thread::current().id());
+        });
         Self {
             graphics: Some(Graphics::new(GraphicsConfig {
                 resolution: configs.resolution,
@@ -185,6 +200,8 @@ impl Fere {
             "end_frame() called without new_frame()"
         );
     }
+
+    pub fn create_mutable_texture(&mut self, size: IVec2) -> () {}
 
     pub fn start_recording(&mut self, port: u16) -> Result<(), Error> {
         if self.recording_session.is_some() {

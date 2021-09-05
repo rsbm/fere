@@ -13,8 +13,8 @@ use super::{
 };
 use crate::graphics::glmanager::light::*;
 use crate::graphics::resources::Meshes;
+use crate::resources::*;
 use fere_common::*;
-use fere_resources::*;
 use gl::types::GLuint;
 use serde::{Deserialize, Serialize};
 use texture_internal::{FrameBuffer, TextureInternal3D};
