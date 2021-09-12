@@ -30,7 +30,6 @@ struct Scene {
 }
 
 struct Resources {
-    square: Arc<Mesh>,
     texture: Arc<Texture>,
 }
 
@@ -61,13 +60,14 @@ impl ProgramWithImgui for Scene {
             size,
             channel: 3,
         };
+        let mut tex = Texture::new(None, tex_data);
+        tex.buffer();
 
         let state = Arc::new(RwLock::new(SceneState::new()));
         Scene {
             renderer,
             resources: Arc::new(Resources {
-                square: fere_examples::read_mesh("square.obj"),
-                texture: Arc::new(Texture::new(None, tex_data)),
+                texture: Arc::new(tex),
             }),
             state,
             last_instant: Instant::now(),
@@ -97,12 +97,9 @@ impl ProgramWithImgui for Scene {
         self.state.write().update();
         let state = Arc::clone(&self.state);
         let resources = Arc::clone(&self.resources);
-
         let mut buffer =
             vec![0; (resources.texture.size.x * resources.texture.size.y * 3) as usize];
         let mut count = 0;
-
-        /*
         for i in 0..resources.texture.size.x {
             for j in 0..resources.texture.size.y {
                 let x = i as f64 / resources.texture.size.x as f64;
@@ -115,7 +112,6 @@ impl ProgramWithImgui for Scene {
             }
         }
         resources.texture.write_buffer(&buffer);
-        */
 
         let render_thread =
             std::thread::spawn(move || render(frame, &*state.read(), resources.as_ref()));
@@ -144,7 +140,6 @@ fn render(mut frame: Frame, state: &SceneState, resources: &Resources) {
         blend_mode: (),
         color: Vec4::new(1.0, 1.0, 1.0, 1.0),
     });
-
     let color = IVec4::new(255, 255, 255, 255);
     let xcolor = IVec4::new(255, 255, 0, 255);
     let ycolor = IVec4::new(0, 255, 255, 255);
