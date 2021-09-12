@@ -32,7 +32,7 @@ impl Texture {
     pub fn buffer(&mut self) {
         assert!(
             crate::is_main_thread(),
-            "Mesh must be buffered in the main thread"
+            "This operation must be done in the main thread"
         );
         unsafe {
             gl::GenTextures(1, &mut self.tex);
@@ -77,11 +77,19 @@ impl Texture {
         }
     }
 
-    pub fn set_pixel(&mut self, _pos: IVec2, _color: IVec3) {
+    pub fn set_pixel(&self, _pos: IVec2, _color: IVec3) {
+        assert!(
+            crate::is_main_thread(),
+            "This operation must be done in the main thread"
+        );
         unimplemented!()
     }
 
-    pub fn write_buffer(&mut self, data: &[u8]) {
+    pub fn write_buffer(&self, data: &[u8]) {
+        assert!(
+            crate::is_main_thread(),
+            "This operation must be done in the main thread"
+        );
         assert_eq!(data.len(), (self.size.x * self.size.y * 3) as usize);
         let tex_param = InternalTexType::Color.tex_parameters();
         unsafe {
