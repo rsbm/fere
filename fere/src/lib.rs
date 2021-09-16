@@ -201,8 +201,6 @@ impl Fere {
         );
     }
 
-    pub fn create_mutable_texture(&mut self, size: IVec2) -> () {}
-
     pub fn start_recording(&mut self, port: u16) -> Result<(), Error> {
         if self.recording_session.is_some() {
             Err(Error::RecordingError(

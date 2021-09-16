@@ -103,10 +103,6 @@ impl TextureInternal2D {
         }
     }
 
-    pub fn tex_param(&self) -> &TexParam {
-        &self.tex_param
-    }
-
     fn parameters_set() {
         unsafe {
             gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MIN_FILTER, gl::NEAREST as i32);

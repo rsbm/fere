@@ -65,7 +65,6 @@ fn render(mut frame: Frame) {
         omni: false,
         chamber_index: 0,
     });
-
     frame.end();
 }
 

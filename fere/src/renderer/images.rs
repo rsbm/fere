@@ -19,7 +19,9 @@ impl RenderContext {
         for image in &self.draw_images {
             image.texture.bind_at(0);
             let image_size: Vec2 = nalgebra::convert(image.texture.size);
-            let pos = image.pos.component_div(&screen_size) - Vec2::new(1.0, 1.0);
+            let pos = (image.pos + nalgebra::convert::<IVec2, Vec2>(image.texture.size) / 2.0)
+                .component_div(&screen_size)
+                - Vec2::new(1.0, 1.0);
             let size = image
                 .size
                 .component_mul(&image_size)

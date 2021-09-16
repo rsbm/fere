@@ -1,6 +1,5 @@
 use crate::resources::*;
 use fere_common::*;
-use parking_lot::RwLock;
 use std::sync::Arc;
 
 pub type ChamberIndex = u32;

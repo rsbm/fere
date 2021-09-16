@@ -2,11 +2,9 @@ use crate::fere_resources::texture::TextureData;
 use fere::prelude::*;
 use fere_window::*;
 use parking_lot::RwLock;
-use rand::prelude::*;
 use rops::*;
 use std::sync::Arc;
 use std::time::Instant;
-use surface::{no_normal_map, GeneralI, TexVar};
 
 struct SceneState {
     t: f64,
@@ -18,7 +16,7 @@ impl SceneState {
     }
 
     fn update(&mut self) {
-        self.t += 0.001;
+        self.t += 0.01;
     }
 }
 
@@ -36,7 +34,7 @@ struct Resources {
 impl ProgramWithImgui for Scene {
     fn new() -> Self {
         let fere_config = FereConfigs {
-            resolution: IVec2::new(2500, 1600),
+            resolution: IVec2::new(1200, 1200),
             shadow_resolution: 512,
             probe_resolution: 256,
             max_major_lights: 16,
@@ -53,7 +51,7 @@ impl ProgramWithImgui for Scene {
             })
             .unwrap();
 
-        let size = IVec2::new(256, 256);
+        let size = IVec2::new(1200, 1200);
         let tex_data = TextureData {
             name: "".to_owned(),
             data: vec![255; (3 * size.x * size.y) as usize],
@@ -75,7 +73,7 @@ impl ProgramWithImgui for Scene {
     }
 
     fn update(&mut self, _imgui_ctx: ImgUiContext) -> String {
-        let cpos = Vec3::new(0.0, 0.0, 600.0);
+        let cpos = Vec3::new(0.0, 0.0, 1200.0);
         let screen_size = self.renderer.configs().resolution;
         let mut camera = SetCamera::new(
             cpos,
@@ -124,40 +122,22 @@ impl ProgramWithImgui for Scene {
     }
 }
 
-fn render(mut frame: Frame, state: &SceneState, resources: &Resources) {
+fn render(mut frame: Frame, _state: &SceneState, resources: &Resources) {
     // Add lights
-    frame.push(AddAmbientLight {
-        color: Vec3::new(0.55, 0.55, 0.55),
-        omni: true,
-        chamber_index: 0,
-    });
-
     frame.push(DrawImage {
         texture: Arc::clone(&resources.texture),
-        pos: Vec2::new(1000.0, 500.0),
+        pos: Vec2::new(600.0, 600.0),
         size: Vec2::new(1.0, 1.0),
         rotation: 0.0,
         blend_mode: (),
         color: Vec4::new(1.0, 1.0, 1.0, 1.0),
     });
-    let color = IVec4::new(255, 255, 255, 255);
-    let xcolor = IVec4::new(255, 255, 0, 255);
-    let ycolor = IVec4::new(0, 255, 255, 255);
-
-    let count = 5;
-    let interval = 10.0;
-    let width = 1.0;
-    let z_offset = 0.1;
-    frame.push(fere_examples::draw_grid(
-        color, xcolor, ycolor, count, interval, width, z_offset,
-    ));
-
     frame.end();
 }
 
 fn main() {
     run_with_imgui::<Scene>(WindowConfig {
-        screen_size: IVec2::new(2500, 1600),
+        screen_size: IVec2::new(1200, 1200),
         initial_window_pos: IVec2::new(0, 0),
         monitor_index: 2,
         title: "123123".into(),

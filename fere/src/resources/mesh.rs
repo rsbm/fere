@@ -1,4 +1,3 @@
-use fere_common::*;
 use fere_resources::mesh::{MeshData, MeshDescription};
 use gl::types::*;
 

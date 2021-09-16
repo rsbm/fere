@@ -1,7 +1,6 @@
 pub mod obj;
 
 use fere_common::*;
-use gl::types::*;
 
 #[derive(Debug, Default)]
 pub struct MeshData {

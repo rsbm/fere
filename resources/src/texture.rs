@@ -1,5 +1,4 @@
 use fere_common::*;
-use gl::types::*;
 use image::{io::Reader as IReader, DynamicImage};
 use std::io::{BufRead, Seek};
 
